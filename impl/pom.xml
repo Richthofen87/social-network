@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>social-network</artifactId>
+        <groupId>ru.skillbox.diplom.group46</groupId>
+        <version>${revision}${sha1}${changelist}</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <name>SKILLBOX :: DIPLOM :: microservice social network :: impl</name>
+    <description>microservice social network impl</description>
+    <artifactId>network-impl</artifactId>
+
+    <properties>
+        <sonar.coverage.exclusions>
+            **/Application.kt,
+            **/config/DBConfig.kt,
+        </sonar.coverage.exclusions>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.skillbox.diplom.group46</groupId>
+            <artifactId>social.network-api</artifactId>
+            <version>${revision}${sha1}${changelist}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.skillbox.diplom.group46</groupId>
+            <artifactId>social.network-db</artifactId>
+            <version>${revision}${sha1}${changelist}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.skillbox.diplom.group46</groupId>
+            <artifactId>social.network-domain</artifactId>
+            <version>${revision}${sha1}${changelist}</version>
+        </dependency>
+    </dependencies>
+
+</project>
