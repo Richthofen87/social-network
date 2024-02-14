@@ -8,9 +8,9 @@ spring:
     change-log: classpath:database-social.network-changelog.xml
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/social-network
-    username: social-network
-    password: social-network
+    url: jdbc:postgresql://localhost:5432/skillbox
+    username: skillbox
+    password: skillbox
     driverClassName: org.postgresql.Driver
 
   jpa:
@@ -21,5 +21,5 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        default_schema: social-network
+        default_schema: skillbox
     open-in-view: false
