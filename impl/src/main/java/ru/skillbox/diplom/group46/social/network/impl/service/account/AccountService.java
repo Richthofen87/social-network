@@ -43,7 +43,7 @@ public class AccountService {
 
     public AccountDto getByEmail(String email) {
         return accountMapper.entityToDto(accountRepository
-                .getById(userRepository.findByEmail(email).getUuid()));
+                .getById(userRepository.findByEmail(email).getId()));
     }
 
     public AccountDto updateAndGet(AccountDto accountDto) {
@@ -83,7 +83,7 @@ public class AccountService {
 
     private Account getAndUpdate(AccountDto accountDto) {
         Account account = accountMapper.dtoToEntity(accountDto);
-        account = accountRepository.getById(account.getUuid());
+        account = accountRepository.getById(account.getId());
         accountMapper.update(account, accountDto);
         return account;
     }

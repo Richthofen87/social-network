@@ -12,5 +12,5 @@ spring:
   liquibase:
     enabled: true
     drop-first: true
-    default-schema: social-network
+#    default-schema: social-network
     liquibase-schema: social-network

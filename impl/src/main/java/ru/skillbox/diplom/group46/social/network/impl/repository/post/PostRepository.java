@@ -1,21 +1,13 @@
-package ru.skillbox.diplom.group46.social.network.impl.repository.user;
+package ru.skillbox.diplom.group46.social.network.impl.repository.post;
 
 import org.springframework.stereotype.Repository;
-import ru.skillbox.diplom.group46.social.network.domain.user.User;
+import ru.skillbox.diplom.group46.social.network.domain.post.Post;
 import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseRepository;
 
 import java.util.UUID;
 
-/**
- * UserRepository
- *
- * @author vladimir.sazonov
- */
-
 @Repository
-public interface UserRepository extends BaseRepository<User> {
-
-    User findByEmail(String email);
+public interface PostRepository extends BaseRepository<Post> {
     @Override
     public default void hardDeleteById(UUID uuid) {
         deleteById(uuid);
@@ -25,4 +17,7 @@ public interface UserRepository extends BaseRepository<User> {
     public default void hardDeleteAll() {
         deleteAll();
     }
+
+
+
 }

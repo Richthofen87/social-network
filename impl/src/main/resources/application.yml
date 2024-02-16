@@ -3,14 +3,14 @@ server:
 
 spring:
   liquibase:
-    enabled: false
+    enabled: true
     drop-first: false
     change-log: classpath:database-social.network-changelog.xml
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/skillbox
-    username: skillbox
-    password: skillbox
+    url: jdbc:postgresql://localhost:5432/social-network
+    username: social-network
+    password: social-network
     driverClassName: org.postgresql.Driver
 
   jpa:
@@ -21,5 +21,5 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        default_schema: skillbox
+#        default_schema: social-network
     open-in-view: false
