@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -14,13 +15,5 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends BaseRepository<Account, UUID> {
-    @Override
-    public default void hardDeleteById(UUID uuid) {
-        deleteById(uuid);
-    }
-
-    @Override
-    public default void hardDeleteAll() {
-        deleteAll();
-    }
+    Optional<Account> findByEmail(String email);
 }

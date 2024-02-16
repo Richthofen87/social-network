@@ -9,15 +9,4 @@ import java.util.UUID;
 
 @Repository
 public interface CountryRepository extends BaseRepository <Country, UUID> {
-
-    @Override
-    public default void hardDeleteById(UUID uuid) {
-        deleteById(uuid);
-    }
-
-    @Override
-    public default void hardDeleteAll() {
-        deleteAll();
-    }
-
 }

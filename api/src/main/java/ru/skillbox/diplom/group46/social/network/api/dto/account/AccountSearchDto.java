@@ -1,9 +1,6 @@
 package ru.skillbox.diplom.group46.social.network.api.dto.account;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.base.BaseSearchDto;
 
 import java.util.List;
@@ -14,13 +11,12 @@ import java.util.List;
  * @author vladimir.sazonov
  */
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AccountSearchDto extends BaseSearchDto {
     private List<String> blockedByIds;
-    private String author;
     private String firstName;
     private String lastName;
     private String city;

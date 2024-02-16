@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group46.social.network.api.resource.account;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,6 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
     ResponseEntity<Boolean> deleteAccountById(@PathVariable("id") UUID id);
 
     @GetMapping("/search")
-    ResponseEntity<List<AccountDto>> search(@RequestParam AccountSearchDto accountSearchDto,
-                                            @RequestParam Pageable Pageable);
+    ResponseEntity<Page<AccountDto>> getAll(AccountSearchDto accountSearchDto,
+                                            Pageable Pageable);
 }

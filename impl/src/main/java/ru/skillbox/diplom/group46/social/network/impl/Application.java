@@ -11,9 +11,10 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseReposi
  *
  * @author author_name
  */
+
 @SpringBootApplication
-@EntityScan("ru.skillbox.diplom.group46.social.network.domain.*")
-@EnableJpaRepositories(basePackages = "ru.skillbox.diplom.group46.social.network.impl.repository.*")
+@EntityScan("ru.skillbox.diplom.group46.social.network.domain")
+@EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
     public static void main(String[] args) {
 

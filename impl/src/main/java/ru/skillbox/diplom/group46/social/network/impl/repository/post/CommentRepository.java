@@ -8,15 +8,4 @@ import java.util.UUID;
 
 @Repository
 public interface CommentRepository extends BaseRepository<Comment, UUID> {
-
-    @Override
-    public default void hardDeleteById(UUID uuid) {
-        deleteById(uuid);
-    }
-
-    @Override
-    public default void hardDeleteAll() {
-        deleteAll();
-    }
-
 }

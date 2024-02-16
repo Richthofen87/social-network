@@ -9,10 +9,10 @@ import ru.skillbox.diplom.group46.social.network.api.dto.base.BaseDto;
  * @author vladimir.sazonov
  */
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AccountDto extends BaseDto {
     private String firstName;
     private String lastName;

@@ -7,6 +7,4 @@ import java.util.UUID;
 
 @Repository
 public interface LikeReactionRepository extends JpaRepository<LikeReaction, UUID> {
-
-
 }

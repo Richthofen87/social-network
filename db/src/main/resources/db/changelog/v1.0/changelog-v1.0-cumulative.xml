@@ -6,5 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <include file="v0.1_01_initial_schema.xml" relativeToChangelogFile="true"/>
+    <include file="postAndcoment_schema.xml" relativeToChangelogFile="true"/>
+    <include file="geoService.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

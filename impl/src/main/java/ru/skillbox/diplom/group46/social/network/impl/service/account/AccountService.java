@@ -1,18 +1,29 @@
 package ru.skillbox.diplom.group46.social.network.impl.service.account;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.SignupDTO;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account;
+import ru.skillbox.diplom.group46.social.network.domain.account.Account_;
+import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
-import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
+import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
+import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
@@ -21,70 +32,119 @@ import java.util.UUID;
  * @author vladimir.sazonov
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
+    private final RoleService roleService;
     private final AccountMapper accountMapper;
-    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
 
     public AccountDto get() {
-        return new AccountDto();
+        log.debug("Method get started()");
+        return accountMapper.entityToDto(getCurrentUserAccount());
     }
 
     public AccountDto updateCurrent(AccountDto accountDto) {
-        return new AccountDto();
+        log.debug("Method updateCurrent(%s) started with param: \"%s\"".formatted(AccountDto.class, accountDto));
+        Account account = getCurrentUserAccount();
+        accountMapper.update(account, accountDto);
+        return accountMapper.entityToDto(account);
     }
 
     public Boolean delete() {
-        return true;
+        log.debug("Method delete started");
+        return deleteById(getCurrentUserAccount().getId());
     }
 
     public AccountDto getByEmail(String email) {
-        return accountMapper.entityToDto(accountRepository
-                .getById(userRepository.findByEmail(email).getId()));
+        log.debug("Method getByEmail(%s) started with param: \"%s\"".formatted(String.class, email));
+        return accountMapper.entityToDto(accountRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Account with email: \"%s\" not found".formatted(email))));
     }
 
-    public AccountDto updateAndGet(AccountDto accountDto) {
-        return accountMapper.entityToDto(accountRepository.save(getAndUpdate(accountDto)));
+    @Transactional
+    public AccountDto update(AccountDto accountDto) {
+        log.debug("Method update(%s) started with param: \"%s\"".formatted(AccountDto.class, accountDto));
+        Account account = accountRepository.getById(accountDto.getId());
+        accountMapper.update(account, accountDto);
+        return accountMapper.entityToDto(account);
     }
 
-    public AccountDto createAndGet(AccountDto accountDto) {
+    public AccountDto create(AccountDto accountDto) {
+        log.debug("Method create(%s) started with param: \"%s\"".formatted(AccountDto.class, accountDto));
         return accountMapper.entityToDto(accountRepository.save(accountMapper.dtoToEntity(accountDto)));
     }
 
-    public Optional<AccountDto> deleteById(UUID uuid) {
-        Account account = accountRepository.getById(uuid);
-        accountRepository.delete(account);
-        return Optional.of(accountMapper.entityToDto(account));
+    @Transactional
+    public AccountDto deleteByIdAndGet(UUID uuid) {
+        log.debug("Method deleteByIdAndGet(%s) started with param: \"%s\"".formatted(UUID.class, uuid));
+        return accountMapper.entityToDto(softDeleteById(uuid));
     }
 
-    public List<AccountDto> search(AccountSearchDto accountSearchDto, Pageable pageable) {
-        return null;
+    @Transactional
+    public Boolean deleteById(UUID uuid) {
+        log.debug("Method deleteById(%s) started with param: \"%s\"".formatted(UUID.class, uuid));
+        Account account = softDeleteById(uuid);
+        account.setDeletionTimestamp(ZonedDateTime.now());
+        return true;
     }
 
     public AccountDto getById(UUID uuid) {
-        return accountMapper.entityToDto(accountRepository.getById(uuid));
+        log.debug("Method getById(%s) started with param: \"%s\"".formatted(UUID.class, uuid));
+        Account account = accountRepository.getById(uuid);
+        if (account == null) throw new EntityNotFoundException("Account with id: \"%s\" not found".formatted(uuid));
+        return account.getIsDeleted() ? null : accountMapper.entityToDto(account);
     }
 
-    public Page<AccountDto> getAll(AccountSearchDto accountSearchDto) {
-
-        return null;
+    public Page<AccountDto> getAll(AccountSearchDto searchDto, Pageable pageable) {
+        log.debug("Method getAll(%s, %s) started with params: \"%s\", \"%s\""
+                .formatted(AccountSearchDto.class, Pageable.class, searchDto, pageable));
+        Specification<Account> spec = SpecificationUtil
+                .equalValueUUID(Account_.id, searchDto.getUuid())
+                .and(SpecificationUtil.equalValue(Account_.isDeleted, searchDto.getIsDeleted()))
+                .and(SpecificationUtil.equalValue(Account_.firstName, searchDto.getFirstName()))
+                .and(SpecificationUtil.equalValue(Account_.lastName, searchDto.getLastName()))
+                .and(SpecificationUtil.equalValue(Account_.city, searchDto.getCity()))
+                .and(SpecificationUtil.equalValue(Account_.country, searchDto.getCountry()))
+                .and(SpecificationUtil.equalValue(Account_.email, searchDto.getEmail()))
+                .and(SpecificationUtil.equalValue(Account_.isBlocked, searchDto.getIsBlocked()))
+                .and(SpecificationUtil.equalValue(Account_.statusCode, searchDto.getStatusCode()))
+                .and(SpecificationUtil.isBetween(Account_.birthDate, searchDto.getAgeFrom(), searchDto.getAgeTo()))
+                .and(SpecificationUtil.isLessValue(Account_.birthDate, searchDto.getAgeTo()))
+                .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()));
+        return accountRepository.findAll(spec, pageable).map(accountMapper::entityToDto);
     }
 
-    public void create(AccountDto accountDto) {
-        accountRepository.save(accountMapper.dtoToEntity(accountDto));
+    @Transactional
+    public Account createNewAccount(SignupDTO signupDTO) {
+        log.debug("Method createNewAccount(%s) started with param: \"%s\"".formatted(SignupDTO.class, signupDTO));
+        String email = signupDTO.getEmail();
+        if (accountRepository.findByEmail(email).isPresent())
+            throw new EntityExistsException("Account with email: \"%s\" already exists".formatted(email));
+        Account account = new Account();
+        account.setFirstName(signupDTO.getFirstName());
+        account.setLastName(signupDTO.getLastName());
+        account.setEmail(email);
+        account.setPassword(passwordEncoder.encode(signupDTO.getPassword1()));
+        account.setCreatedDate(ZonedDateTime.now());
+        account.setRegDate(ZonedDateTime.now());
+        account.addRole(roleService.getUserRole());
+        return accountRepository.save(account);
     }
 
-    public void update(AccountDto accountDto) {
-        getAndUpdate(accountDto);
+    private Account getCurrentUserAccount() {
+        return accountRepository.getById(CurrentUserExtractor.getCurrentUser().getId());
     }
 
-    private Account getAndUpdate(AccountDto accountDto) {
-        Account account = accountMapper.dtoToEntity(accountDto);
-        account = accountRepository.getById(account.getId());
-        accountMapper.update(account, accountDto);
+    private Account softDeleteById(UUID uuid) {
+        log.debug("Method softDeleteById(%s) started with param: \"%s\"".formatted(UUID.class, uuid));
+        Account account = accountRepository.findById(uuid).orElseThrow(
+                () -> new EntityNotFoundException("Account with id: \"%s\" not found".formatted(uuid)));
+        account.setDeletionTimestamp(ZonedDateTime.now());
+        accountRepository.deleteById(uuid);
         return account;
     }
 }

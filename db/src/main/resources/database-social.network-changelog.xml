@@ -8,9 +8,5 @@
     <property name="schema" value="social-network"/>
 
     <include file="db/changelog/v1.0/changelog-v1.0-cumulative.xml" relativeToChangelogFile="true"/>
-    <include file="db/changelog/v1.0/postAndcoment_schema.xml" relativeToChangelogFile="true"/>
-    <include file="db/changelog/v1.0/geoService.xml" relativeToChangelogFile="true"/>
-
-
 
    </databaseChangeLog>

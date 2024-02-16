@@ -14,11 +14,11 @@ import java.time.ZonedDateTime;
  * @author vladimir.sazonov
  */
 
+@Data
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Account extends User {
 
     @Column(name = "phone")

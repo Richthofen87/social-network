@@ -3,7 +3,7 @@ server:
 
 spring:
   liquibase:
-    enabled: true
+    enabled: false
     drop-first: false
     change-log: classpath:database-social.network-changelog.xml
 
@@ -21,5 +21,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-#        default_schema: social-network
+#        default_schema: public
     open-in-view: false
+
+captcha:
+  expiration: 5m
+
+access-token:
+  private: ${ACCESS_TOKEN_PRIVATE_KEY_PATH}
+  public: ${ACCESS_TOKEN_PUBLIC_KEY_PATH}
+refresh-token:
+  private: ${REFRESH_TOKEN_PRIVATE_KEY_PATH}
+  public: ${REFRESH_TOKEN_PUBLIC_KEY_PATH}

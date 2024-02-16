@@ -1,10 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.domain.user.role;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
 
 import java.util.Set;
@@ -16,9 +13,8 @@ import java.util.UUID;
  * @author vladimir.sazonov
  */
 
+@Data
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
@@ -28,7 +24,7 @@ public class Role {
     @Column(name = "id", updatable = false)
     private UUID uuid;
 
-    @Column(name = "value", nullable = false)
+    @Column(name = "value")
     private String value;
 
     @ManyToMany(mappedBy = "roles")
