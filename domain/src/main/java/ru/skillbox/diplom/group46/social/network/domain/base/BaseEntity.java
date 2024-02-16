@@ -13,9 +13,10 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false)
-    private UUID uuid;
+    @Column(name = "user_id",updatable = false)
+    private UUID id;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+
 }

@@ -1,0 +1,79 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create post table" author="ilya.kukushkin">
+        <createTable tableName="post">
+            <column name="user_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean"/>
+            <column name="time" type="timestamp(6)"/>
+            <column name="time_changed" type="timestamp(6)"/>
+            <column name="title" type="varchar(255)"/>
+            <column name="type" type="varchar(255)"/>
+            <column name="post_text" type="text"/>
+            <column name="is_blocked" type="boolean"/>
+            <column name="comments_count" type="Integer"/>
+            <column name="reaction_type" type="varchar(255)"/>
+            <column name="my_reaction" type="varchar(255)"/>
+            <column name="like_amount" type="Integer"/>
+            <column name="my_like" type="boolean"/>
+            <column name="image_path" type="varchar(255)"/>
+            <column name="publish_date" type="timestamp(6)"/>
+
+        </createTable>
+    </changeSet>
+    <changeSet id="create comment table" author="ilya.kukushkin">
+        <createTable tableName="comment">
+            <column name="user_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" />
+            <column name="comment_type" type="varchar(255)"/>
+            <column name="comment_time" type="timestamp(6)"/>
+            <column name="time_changed" type="timestamp(6)"/>
+            <column name="author_id" type="uuid"/>
+            <column name="parent_id" type="uuid"/>
+            <column name="comment_text" type="text"/>
+            <column name="post_id" type="uuid"/>
+            <column name="is_blocked" type="boolean"/>
+            <column name="like_amount" type="Integer"/>
+            <column name="my_like" type="boolean"/>
+            <column name="comments_count" type="integer"/>
+            <column name="image_path" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create like_reaction table" author="ilya.kukushkin">
+        <createTable tableName="like_reaction">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="reaction_type" type="varchar(255)"/>
+            <column name="count" type="integer"/>
+            <column name="post_id" type="uuid"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="create post_tag table" author="ilya.kukushkin">
+        <createTable tableName="post_tag">
+            <column name="post_id" type="uuid">
+                <constraints foreignKeyName="post_id" />
+            </column>
+            <column name="tag_id" type="uuid">
+                <constraints foreignKeyName="tag_id" />
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create tag table" author="ilya.kukushkin">
+        <createTable tableName="tag">
+            <column name="user_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean"/>
+            <column name="name" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
