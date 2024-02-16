@@ -7,7 +7,7 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseReposi
 import java.util.UUID;
 
 @Repository
-public interface PostRepository extends BaseRepository<Post> {
+public interface PostRepository extends BaseRepository<Post, UUID> {
     @Override
     public default void hardDeleteById(UUID uuid) {
         deleteById(uuid);

@@ -14,10 +14,13 @@ public class LikeReaction{
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID id;
+
     @Column (name = "reaction_type")
     private String reactionType;
+
     @Column (name = "count")
     private Integer count;
+
     @ManyToOne(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
     @JoinColumn(name = "post_id")
     private Post post;

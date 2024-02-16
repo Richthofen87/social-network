@@ -14,13 +14,10 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseReposi
 @SpringBootApplication
 @EntityScan("ru.skillbox.diplom.group46.social.network.domain.*")
 @EnableJpaRepositories(basePackages = "ru.skillbox.diplom.group46.social.network.impl.repository.*")
-
-@SpringBootApplication()
-@EntityScan(basePackages = {"ru.skillbox.diplom.group46.social.network.*"})
-@EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
-
     public static void main(String[] args) {
+
+
         SpringApplication.run(Application.class, args);
     }
 }
