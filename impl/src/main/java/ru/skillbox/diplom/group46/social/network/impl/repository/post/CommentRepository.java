@@ -1,7 +1,5 @@
 package ru.skillbox.diplom.group46.social.network.impl.repository.post;
 
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseRepository;
@@ -9,7 +7,7 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseReposi
 import java.util.UUID;
 
 @Repository
-public interface CommentRepository extends BaseRepository<Comment> {
+public interface CommentRepository extends BaseRepository<Comment, UUID> {
 
     @Override
     public default void hardDeleteById(UUID uuid) {

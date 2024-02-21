@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.mapper;
+package ru.skillbox.diplom.group46.social.network.impl.mapper.post;
 
 import org.mapstruct.Mapper;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.LikeReactionDto;

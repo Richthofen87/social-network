@@ -17,13 +17,7 @@
     <properties>
         <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
     </properties>
-<dependencies>
-    <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-jpamodelgen</artifactId>
-        <version>6.2.7.Final</version>
-    </dependency>
-</dependencies>
+
     <build>
         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>

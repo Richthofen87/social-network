@@ -16,8 +16,10 @@ import java.util.List;
 @Entity
 @Table(name = "tag")
 public class Tag extends BaseEntity {
+
     @Column (name = "name")
     private String name;
+
     @ManyToMany
     private List<Post> posts = new ArrayList<>();
 }

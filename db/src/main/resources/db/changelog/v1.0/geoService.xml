@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="create city table" author="maxim.novgorodov">
+        <createTable tableName="city">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValue="false">
+            </column>
+            <column name="title" type="varchar(255)"/>
+            <column name="country_id" type="varchar(255)"/>
+        </createTable>
+        <createTable tableName="country">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValue="false">
+            </column>
+            <column name="title" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+
+    <!-- TABLES -->
+    <!-- END TABLES -->
+
+    <!-- INDEXES -->
+    <!-- END INDEXES -->
+
+    <!-- FOREIGN KEYS -->
+    <!-- END FOREIGN KEYS -->
+
+    <!-- SEQUENCES -->
+    <!-- EDN SEQUENCES -->
+
+</databaseChangeLog>

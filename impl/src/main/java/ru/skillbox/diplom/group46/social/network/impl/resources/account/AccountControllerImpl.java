@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.resouce.account;
+package ru.skillbox.diplom.group46.social.network.impl.resources.account;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
