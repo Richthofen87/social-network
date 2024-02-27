@@ -7,6 +7,10 @@
 
     <property name="schema" value="social-network"/>
 
-    <include file="db/changelog/v1.0/changelog-v1.0-cumulative.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/v1.0/v0.1_01_initial_schema.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/v1.0/postAndcoment_schema.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/v1.0/geoService.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/v1.0/friend_schema.xml" relativeToChangelogFile="true"/>
+
 
    </databaseChangeLog>

@@ -8,11 +8,11 @@ import ru.skillbox.diplom.group46.social.network.api.dto.post.*;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/post/")
+@RequestMapping("/api/v1/post")
 public interface PostController {
 
     @GetMapping
-    ResponseEntity<Set<PostDto>> get(@RequestBody PostSearchDto postSearchDto, Pageable pageable);
+    ResponseEntity<Set<PostDto>> get(PostSearchDto postSearchDto, Pageable pageable);
 
     @PutMapping
     ResponseEntity<PostDto> update(@RequestBody PostDto postDto);

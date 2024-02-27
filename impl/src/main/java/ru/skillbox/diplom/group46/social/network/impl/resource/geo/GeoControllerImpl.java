@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.geo.CountryDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.geo.GeoController;
-import ru.skillbox.diplom.group46.social.network.impl.service.geo.GeoService;
+import ru.skillbox.diplom.group46.social.network.impl.auth.service.geo.GeoService;
 
 
 import java.util.List;

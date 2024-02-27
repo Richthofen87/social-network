@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.auth;
+package ru.skillbox.diplom.group46.social.network.impl.auth.service.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
