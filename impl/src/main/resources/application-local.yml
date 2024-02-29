@@ -21,7 +21,7 @@ spring:
     liquibase-schema: social-network
 
   datasource:
-      url: jdbc:postgresql://db:5432/social-network
+      url: jdbc:postgresql://localhost:5432/social-network
       username: social-network
       password: social-network
       driverClassName: org.postgresql.Driver

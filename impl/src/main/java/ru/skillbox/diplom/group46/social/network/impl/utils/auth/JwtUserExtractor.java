@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.group46.social.network.impl.utils.auth;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -27,12 +26,5 @@ public class JwtUserExtractor {
         user.setLastName(jwt.getClaim("lastName"));
         user.setEmail(jwt.getClaim("email"));
         return user;
-    }
-
-    public String getUsernameFromToken(String token) {
-        JwtDecoder jwtDecoder = securityConfig.jwtAccessTokenDecoder();
-        Jwt jwt = jwtDecoder.decode(token);
-        Claims claims = (Claims) jwt.getClaims();
-        return claims.getSubject();
     }
 }

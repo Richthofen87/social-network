@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.SignupDTO;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 import ru.skillbox.diplom.group46.social.network.domain.captcha.CaptchaEntity;
 import ru.skillbox.diplom.group46.social.network.domain.exception.captcha.CaptchaException;
@@ -58,15 +58,15 @@ public class CaptchaService {
                 ZonedDateTime.now(), answer));
     }
 
-    public void checkCaptcha(SignupDTO signupDTO) {
-        log.debug("Method checkCaptcha(%s) started with param: \"%s\"".formatted(SignupDTO.class, signupDTO));
-        UUID captchaId = signupDTO.getCaptchaSecret();
+    public void checkCaptcha(RegistrationDto registrationDto) {
+        log.debug("Method checkCaptcha(%s) started with param: \"%s\"".formatted(RegistrationDto.class, registrationDto));
+        UUID captchaId = registrationDto.getCaptchaSecret();
         CaptchaEntity captcha = repository.findById(captchaId)
                 .orElseThrow(() -> new EntityNotFoundException("Captcha with id: \"%s\" not found".formatted(captchaId)));
         if (!ZonedDateTime.now().isBefore(captcha.getIssuedAt().plus(EXPIRATION)))
             throw new CaptchaException("Captcha with id: \"%s\" has expired".formatted(captchaId));
 
-        if (!signupDTO.getCaptchaCode().equals(captcha.getCode()))
+        if (!registrationDto.getCaptchaCode().equals(captcha.getCode()))
             throw new CaptchaException("Provided code \"%s\" for captcha with id: \"%s\" has expired"
                     .formatted(captcha.getCode(), captchaId));
     }

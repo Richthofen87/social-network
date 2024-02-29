@@ -16,12 +16,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.LoginDTO;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.SignupDTO;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.TokenDTO;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.exception.auth.AppError;
-import ru.skillbox.diplom.group46.social.network.api.service.auth.AuthService;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.domain.user.role.Role;
 import ru.skillbox.diplom.group46.social.network.impl.auth.configs.JwtAuthenticationToken;
@@ -31,9 +27,10 @@ import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthService {
 
     @Autowired
     private UserService userService;
@@ -54,26 +51,20 @@ public class AuthServiceImpl implements AuthService {
     @Qualifier("jwtRefreshTokenAuthProvider")
     private JwtAuthenticationProvider jwtAuthenticationProvider;
 
-    @Override
-    public ResponseEntity<?> createNewUser(SignupDTO signupDTO) {
-        captchaService.checkCaptcha(signupDTO);
-        if (!signupDTO.getPassword1().equals(signupDTO.getPassword2())) {
+    public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
+        captchaService.checkCaptcha(registrationDto);
+        if (!registrationDto.getPassword1().equals(registrationDto.getPassword2())) {
             return ResponseEntity.badRequest().body(new AppError(HttpStatus.BAD_REQUEST.value(), "Пароли не совпадают"));
         }
 
-        /*if (userService.findByFirstName(signupDTO.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new AppError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует"));
-        }*/
-
-        User user = userService.createNewUser(signupDTO);
+        User user = userService.createNewUser(registrationDto);
         return ResponseEntity.ok(new UserDTO(user.getId().toString(), user.getFirstName(), user.getEmail()));
     }
 
-    @Override
-    public ResponseEntity<?> createAuthToken(LoginDTO loginDTO, HttpServletResponse response) {
+    public ResponseEntity<?> createAuthToken(AuthenticateDto authenticateDto, HttpServletResponse response) {
         try {
-            User user = userService.findByEmail(loginDTO.getEmail());
-            if (user == null || !passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            User user = userService.findByEmail(authenticateDto.getEmail());
+            if (user == null || !passwordEncoder.matches(authenticateDto.getPassword(), user.getPassword())) {
                 throw new BadCredentialsException("Неправильный логин или пароль");
             }
             Role userRole = roleService.getUserRole();
@@ -83,12 +74,12 @@ public class AuthServiceImpl implements AuthService {
             JwtAuthenticationToken authenticationToken = JwtAuthenticationToken.authenticated(user, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            TokenDTO tokenDTO = tokenGenerator.createToken(authenticationToken);
+            AuthenticateResponseDto authenticateResponseDto = tokenGenerator.createToken(authenticationToken);
 
-            String cookieValue = String.format("jwt=%s; HttpOnly; Secure; Path=/; SameSite=None", tokenDTO.getAccessToken());
+            String cookieValue = String.format("jwt=%s; HttpOnly; Secure; Path=/; SameSite=None", authenticateResponseDto.getAccessToken());
             response.setHeader("Set-Cookie", cookieValue);
 
-            return ResponseEntity.ok(tokenDTO);
+            return ResponseEntity.ok(authenticateResponseDto);
         } catch (org.springframework.security.core.AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AppError(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль"));
@@ -99,16 +90,14 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    @Override
-    public TokenDTO refreshToken(TokenDTO tokenDTO) {
+    public AuthenticateResponseDto refreshToken(AuthenticateResponseDto authenticateResponseDto) {
         Authentication authentication = jwtAuthenticationProvider.authenticate(
-                new BearerTokenAuthenticationToken(tokenDTO.getRefreshToken()));
+                new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
         Jwt jwt = (Jwt) authentication.getCredentials();
 
         return tokenGenerator.createToken(authentication);
     }
 
-    @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
         try {
             SecurityContextHolder.clearContext();
@@ -126,5 +115,23 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+
+    public ResponseEntity<?> changePassword(UUID userId, PasswordChangeDto passwordChangeDto) {
+        User user = userService.findById(userId);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(new AppError(400, "Пользователь не найден"));
+        }
+
+        String newPassword1 = passwordChangeDto.getNewPassword1();
+        String newPassword2 = passwordChangeDto.getNewPassword2();
+        if (!newPassword1.equals(newPassword2)) {
+            return ResponseEntity.badRequest().body(new AppError(400, "Введённые пароли не совпадают"));
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword1));
+        userService.save(user);
+
+        return ResponseEntity.ok().build();
+    }
 
 }

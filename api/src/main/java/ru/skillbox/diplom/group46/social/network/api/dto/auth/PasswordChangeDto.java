@@ -1,0 +1,9 @@
+package ru.skillbox.diplom.group46.social.network.api.dto.auth;
+
+import lombok.Data;
+
+@Data
+public class PasswordChangeDto {
+    private String newPassword1;
+    private String newPassword2;
+}

@@ -31,7 +31,6 @@ import java.util.Set;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
-    private final JwtUserExtractor jwtUserExtractor;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
@@ -44,12 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         jwt = extractAccessTokenFromCookie(request);
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = jwtUserExtractor.getUserFromToken(jwt);
-            Collection<? extends GrantedAuthority> authorities = getAuthoritiesFromDummyRoles();
-            JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken
-                    (
-                            user, jwt, authorities
-                    );
+
             BearerTokenAuthenticationToken bearerTokenAuthenticationToken = new BearerTokenAuthenticationToken(jwt);
             bearerTokenAuthenticationToken.setAuthenticated(true);
             Authentication authentication = jwtAuthenticationProvider.authenticate(bearerTokenAuthenticationToken);
@@ -72,11 +66,4 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private Collection<? extends GrantedAuthority> getAuthoritiesFromDummyRoles() {
-        // Создаем заглушку ролей
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("USER"));
-        // Добавьте другие роли по необходимости
-        return authorities;
-    }
 }
