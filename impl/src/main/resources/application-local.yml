@@ -1,17 +1,32 @@
+server:
+  port: 8080
+
 spring:
   boot:
     admin:
       client:
         enabled: false
+
   cloud:
     kubernetes:
       config:
         enabled: false
       reload:
         monitoring-config-maps: false
+
   liquibase:
     enabled: true
-    drop-first: true
+    drop-first: false
     default-schema: social-network
     liquibase-schema: social-network
 
+  datasource:
+      url: jdbc:postgresql://db:5432/social-network
+      username: social-network
+      password: social-network
+      driverClassName: org.postgresql.Driver
+
+ACCESS_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/access-token-private.key"
+ACCESS_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/access-token-public.key"
+REFRESH_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/refresh-token-private.key"
+REFRESH_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/refresh-token-public.key"

@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.impl.repository.base;
 
 import jakarta.persistence.EntityManager;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
@@ -11,8 +12,8 @@ import java.util.UUID;
 
 @NoRepositoryBean
 public class BaseRepositoryImpl<T extends BaseEntity> extends SimpleJpaRepository<T, UUID> implements BaseRepository<T, UUID> {
-    public BaseRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
-        super(domainClass, entityManager);
+    public BaseRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+        super(entityInformation, entityManager);
     }
 
     @Override
@@ -48,8 +49,6 @@ public class BaseRepositoryImpl<T extends BaseEntity> extends SimpleJpaRepositor
 
     @Override
     public T getById(UUID uuid) {
-        return super.findById(uuid).get();
+        return super.findById(uuid).orElse(null);
     }
-
-
 }

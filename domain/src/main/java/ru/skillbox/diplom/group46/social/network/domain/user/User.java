@@ -1,10 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
 import ru.skillbox.diplom.group46.social.network.domain.user.role.Role;
 
@@ -18,11 +15,12 @@ import java.util.Set;
  * @author vladimir.sazonov
  */
 
+@Data
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="\"user\"")
+@EqualsAndHashCode(callSuper = true)
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends BaseEntity {
 
@@ -44,9 +42,17 @@ public class User extends BaseEntity {
     @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
+    @EqualsAndHashCode.Exclude
     @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        role.getUsers().add(this);
+        roles.add(role);
+    }
 }

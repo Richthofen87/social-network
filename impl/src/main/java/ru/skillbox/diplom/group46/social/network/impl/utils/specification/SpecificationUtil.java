@@ -37,6 +37,11 @@ public class SpecificationUtil<T> {
                 builder.lessThan(root.get(singularAttribute), comparable);
     }
 
+    public static Specification isGreatValue(SingularAttribute singularAttribute, Comparable comparable) {
+        return (root, query, builder) -> comparable == null || singularAttribute == null ? builder.conjunction() :
+                builder.greaterThan(root.get(singularAttribute), comparable);
+    }
+
     public static Specification isBetween(SingularAttribute singularAttribute, Comparable comparable, Comparable comparableTwo) {
         return (root, query, builder) -> comparable == null && comparableTwo == null ? builder.conjunction() :
                 builder.between(root.get(singularAttribute), comparable, comparableTwo);

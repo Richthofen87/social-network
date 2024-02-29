@@ -16,17 +16,18 @@
     <packaging>pom</packaging>
 
     <properties>
+        <sha1/>
+        <revision>1.0.0</revision>
         <java.version>17</java.version>
+        <changelist>-SNAPSHOT</changelist>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <spring-boot-maven-plugin.version>3.1.2</spring-boot-maven-plugin.version>
-        <start.class>ru.skillbox.diplom.group46.social.network.impl.Application</start.class>
-        <revision>1.0.0</revision>
-        <sha1/>
-        <changelist>-SNAPSHOT</changelist>
-        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <hibernate.jpamodelgen.version>6.4.3.Final</hibernate.jpamodelgen.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <start.class>ru.skillbox.diplom.group46.social.network.impl.Application</start.class>
     </properties>
 
     <name>SKILLBOX :: DIPLOM :: social network</name>
@@ -64,12 +65,56 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${org.mapstruct.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>6.1.7.Final</version>
+            <version>${hibernate.jpamodelgen.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.37.3</version>
         </dependency>
 
     </dependencies>
@@ -97,7 +142,7 @@
                         <path>
                             <groupId>org.hibernate.orm</groupId>
                             <artifactId>hibernate-jpamodelgen</artifactId>
-                            <version>6.4.3.Final</version>
+                            <version>${hibernate.jpamodelgen.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -135,7 +180,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <!--    Нужно дописать путь к классу и его execution            -->
             </plugin>
         </plugins>
     </build>

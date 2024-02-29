@@ -8,16 +8,4 @@ import java.util.UUID;
 
 @Repository
 public interface PostRepository extends BaseRepository<Post, UUID> {
-    @Override
-    public default void hardDeleteById(UUID uuid) {
-        deleteById(uuid);
-    }
-
-    @Override
-    public default void hardDeleteAll() {
-        deleteAll();
-    }
-
-
-
 }

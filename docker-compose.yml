@@ -1,7 +1,16 @@
-version: '3.8'
+version: '1.0'
 services:
+  social-network:
+    container_name: social-network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
   db:
-    container_name: pg
+    container_name: db
     image: postgres
     restart: always
     environment:

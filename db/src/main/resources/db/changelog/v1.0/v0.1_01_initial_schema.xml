@@ -15,8 +15,8 @@
             <column name="last_name" type="varchar(255)"/>
             <column name="email" type="varchar(255)"/>
             <column name="password" type="varchar(255)"/>
-            <column name="reg_date" type="varchar(255)"/>
-            <column name="created_date" type="varchar(255)"/>
+            <column name="reg_date" type="timestamptz"/>
+            <column name="created_date" type="timestamptz"/>
         </createTable>
     </changeSet>
 
@@ -32,13 +32,13 @@
             <column name="city" type="varchar(255)"/>
             <column name="country" type="varchar(255)"/>
             <column name="status_code" type="varchar(255)"/>
-            <column name="birth_date" type="varchar(255)"/>
+            <column name="birth_date" type="timestamptz"/>
             <column name="message_permission" type="varchar(255)"/>
-            <column name="last_online_time" type="varchar(255)"/>
+            <column name="last_online_time" type="timestamptz"/>
             <column name="is_online" type="boolean"/>
             <column name="is_blocked" type="boolean"/>
             <column name="emoji_status" type="varchar(255)"/>
-            <column name="deletion_timestamp" type="varchar(255)"/>
+            <column name="deletion_timestamp" type="timestamptz"/>
         </createTable>
     </changeSet>
 
@@ -64,16 +64,24 @@
         </createTable>
     </changeSet>
 
-    <!-- TABLES -->
-    <!-- END TABLES -->
+    <changeSet id="create captcha table" author="vladimir.sazonov">
+        <createTable tableName="captcha">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="issued_at" type="timestamptz"/>
+            <column name="code" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
 
-    <!-- INDEXES -->
-    <!-- END INDEXES -->
-
-    <!-- FOREIGN KEYS -->
-    <!-- END FOREIGN KEYS -->
-
-    <!-- SEQUENCES -->
-    <!-- EDN SEQUENCES -->
+    <changeSet id="insert roles" author="vladimir.sazonov">
+        <loadData
+                file="db/changelog/v1.0/data/roles.csv"
+                separator=";"
+                tableName="role">
+            <column name="id" type="uuid"/>
+            <column name="value" type="varchar(255)"/>
+        </loadData>
+    </changeSet>
 
 </databaseChangeLog>
