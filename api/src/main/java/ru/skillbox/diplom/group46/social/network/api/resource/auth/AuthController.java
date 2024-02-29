@@ -14,28 +14,28 @@ public interface AuthController {
     ResponseEntity<?> register(@RequestBody RegistrationDto registrationDto);
 
     @PostMapping("/refresh")
-    ResponseEntity<?> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto);
+    ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto);
 
-    /*@PostMapping("/password/recovery/{recoveryTokenId}")
+    @PostMapping("/password/recovery/{recoveryTokenId}")
     ResponseEntity<String> recoverPassword(
             @PathVariable("recoveryTokenId") String recoveryTokenId,
             @RequestBody NewPasswordDto newPasswordDto
     );
 
-    @PostMapping("/password/recovery")
+    @PostMapping("/password/recovery/")
     ResponseEntity<?> sendRecoveryEmail(@RequestBody PasswordRecoveryDto passwordRecoveryDto);
-*/
+
     @PostMapping("/logout")
     ResponseEntity<?> logout(HttpServletResponse response);
 
     @PostMapping("/login")
     ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
 
-    /*@PostMapping("/change-password-link")
-    ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);
+    @PostMapping("/api/v1/auth/admin/revokeUserTokens/{email}")
+    ResponseEntity<String> revokeUserTokens(@PathVariable String email);
 
-    @PostMapping("/change-email-link")
-    ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);*/
+    @PostMapping("/admin/revokeAllTokens")
+    ResponseEntity<String> revokeAllTokens();
 
     @GetMapping("/captcha")
     ResponseEntity<CaptchaDto> getCaptcha();

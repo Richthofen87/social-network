@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.auth.AuthController;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.auth.AuthService;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.auth.CaptchaService;
+import ru.skillbox.diplom.group46.social.network.impl.service.auth.AuthService;
+import ru.skillbox.diplom.group46.social.network.impl.service.auth.CaptchaService;
 
 
 @RestController
@@ -25,32 +25,22 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<?> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto) {
-        return ResponseEntity.ok(authService.refreshToken(authenticateResponseDto));
+    public ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto) {
+        return authService.refreshToken(authenticateResponseDto);
     }
 
-    /*@Override
+    @Override
     public ResponseEntity<String> recoverPassword(
             String recoveryTokenId,
             @RequestBody NewPasswordDto newPasswordDto
     ) {
-        ResponseEntity<?> response = authService.recoverPassword(recoveryTokenId, newPasswordDto);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok("Пароль успешно изменён");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверная или просроченная ссылка");
-        }
+        return authService.recoverPassword(recoveryTokenId, newPasswordDto);
     }
 
     @Override
     public ResponseEntity<?> sendRecoveryEmail(PasswordRecoveryDto passwordRecoveryDto) {
-        ResponseEntity<?> response = authService.sendRecoveryEmail(passwordRecoveryDto);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok("Письмо на почту отправлено");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Нет пользователя с указанной почтой");
-        }
-    }*/
+        return authService.sendRecoveryEmail(passwordRecoveryDto);
+    }
 
     @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
@@ -63,25 +53,15 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity.ok(authService.createAuthToken(authenticateDto, response));
     }
 
-    /*@Override
-    public ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto) {
-        ResponseEntity<?> response = authService.changePassword(passwordChangeDto);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok("Пароль успешно изменён");
-        } else {
-            return ResponseEntity.badRequest().body(response.getBody());
-        }
+    @Override
+    public ResponseEntity<String> revokeUserTokens(String email) {
+        return authService.revokeUserTokens(email);
     }
 
     @Override
-    public ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto) {
-        ResponseEntity<?> response = authService.changeEmail(changeEmailDto);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok("Email успешно изменён");
-        } else {
-            return ResponseEntity.badRequest().body(response.getBody());
-        }
-    }*/
+    public ResponseEntity<String> revokeAllTokens() {
+        return authService.revokeAllTokens();
+    }
 
     @Override
     public ResponseEntity<CaptchaDto> getCaptcha() {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.account.AccountController;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.account.AccountService;
+import ru.skillbox.diplom.group46.social.network.impl.service.account.AccountService;
 
 import java.util.UUID;
 
