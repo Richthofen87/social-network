@@ -16,7 +16,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends BaseRepository<User, UUID> {
 
-    User findByFirstName(String username);
     Optional<User> findByEmail(String email);
-    boolean existsByFirstName(String username);
+    boolean existsByEmail(String email);
+
 }

@@ -22,12 +22,13 @@ import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.domain.user.role.Role;
 import ru.skillbox.diplom.group46.social.network.impl.auth.configs.JwtAuthenticationToken;
 import ru.skillbox.diplom.group46.social.network.impl.auth.security.TokenGenerator;
+import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
+import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -50,6 +51,9 @@ public class AuthService {
     @Autowired
     @Qualifier("jwtRefreshTokenAuthProvider")
     private JwtAuthenticationProvider jwtAuthenticationProvider;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto);
@@ -115,23 +119,43 @@ public class AuthService {
         }
     }
 
-
-    public ResponseEntity<?> changePassword(UUID userId, PasswordChangeDto passwordChangeDto) {
-        User user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.badRequest().body(new AppError(400, "Пользователь не найден"));
+    public ResponseEntity<?> changePassword(PasswordChangeDto passwordChangeDto) {
+        User currentUser = CurrentUserExtractor.getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.badRequest().body(new AppError(
+                    400, "Пользователь не найден"));
         }
 
         String newPassword1 = passwordChangeDto.getNewPassword1();
         String newPassword2 = passwordChangeDto.getNewPassword2();
         if (!newPassword1.equals(newPassword2)) {
-            return ResponseEntity.badRequest().body(new AppError(400, "Введённые пароли не совпадают"));
+            return ResponseEntity.badRequest().body(new AppError(
+                    400, "Введённые пароли не совпадают"));
         }
 
-        user.setPassword(passwordEncoder.encode(newPassword1));
-        userService.save(user);
+        currentUser.setPassword(passwordEncoder.encode(newPassword1));
+        userRepository.save(currentUser);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Пароль успешно изменён");
+
     }
 
+    public ResponseEntity<?> changeEmail(ChangeEmailDto changeEmailDto) {
+        User currentUser = CurrentUserExtractor.getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.badRequest().body(new AppError(
+                    400, "Пользователь не найден"));
+        }
+
+        String newEmail = changeEmailDto.getEmail().getEmail();
+        if (userRepository.existsByEmail(newEmail)) {
+            return ResponseEntity.badRequest().body(new AppError(
+                    400, "Этот адрес электронной почты уже используется"));
+        }
+
+        currentUser.setEmail(newEmail);
+        userRepository.save(currentUser);
+
+        return ResponseEntity.ok("Email успешно изменён");
+    }
 }

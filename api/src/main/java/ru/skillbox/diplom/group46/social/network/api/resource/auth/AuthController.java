@@ -3,13 +3,8 @@ package ru.skillbox.diplom.group46.social.network.api.resource.auth;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.PasswordChangeDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateResponseDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -31,6 +26,9 @@ public interface AuthController {
     ResponseEntity<CaptchaDto> getCaptcha();
 
     @PostMapping("/change-password-link")
-    ResponseEntity<?> changePasswordLink(UUID userId, @RequestBody PasswordChangeDto passwordChangeDto);
+    ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);
+
+    @PostMapping("/change-email-link")
+    ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);
 
 }

@@ -1,9 +1,15 @@
 package ru.skillbox.diplom.group46.social.network.api.dto.auth;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthenticateResponseDto {
+    private String userId;
     private String accessToken;
     private String refreshToken;
+
 }
+

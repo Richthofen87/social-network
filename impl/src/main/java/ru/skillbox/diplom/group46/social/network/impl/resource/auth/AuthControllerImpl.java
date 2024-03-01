@@ -6,16 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.PasswordChangeDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateResponseDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.auth.AuthController;
 import ru.skillbox.diplom.group46.social.network.impl.service.auth.AuthService;
 import ru.skillbox.diplom.group46.social.network.impl.service.auth.CaptchaService;
-
-import java.util.UUID;
 
 
 @RestController
@@ -43,7 +38,7 @@ public class AuthControllerImpl implements AuthController {
     @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
         authService.logout(response);
-        return ResponseEntity.ok("Выход из системы успешно выполнен");
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -52,12 +47,23 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<?> changePasswordLink(UUID userId, @RequestBody PasswordChangeDto passwordChangeDto) {
-        ResponseEntity<?> response = authService.changePassword(userId, passwordChangeDto);
+    public ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto) {
+        ResponseEntity<?> response = authService.changePassword(passwordChangeDto);
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok("Пароль успешно изменён");
         } else {
             return ResponseEntity.badRequest().body(response.getBody());
         }
     }
+
+    @Override
+    public ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto) {
+        ResponseEntity<?> response = authService.changeEmail(changeEmailDto);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok("Email успешно изменён");
+        } else {
+            return ResponseEntity.badRequest().body(response.getBody());
+        }
+    }
+
 }

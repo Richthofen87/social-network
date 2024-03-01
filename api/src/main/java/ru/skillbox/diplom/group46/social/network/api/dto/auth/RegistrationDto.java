@@ -2,6 +2,8 @@ package ru.skillbox.diplom.group46.social.network.api.dto.auth;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class RegistrationDto {
     private String id;
@@ -12,5 +14,5 @@ public class RegistrationDto {
     private String password1;
     private String password2;
     private String captchaCode;
-    private String captchaSecret;
+    private UUID captchaSecret;
 }
