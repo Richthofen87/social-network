@@ -1,9 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.api.dto.auth;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import ru.skillbox.diplom.group46.social.network.domain.user.User;
 
 import java.util.UUID;
 
@@ -12,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserDTO {
 
-    private String id;
+    private UUID id;
 
     private String username;
 

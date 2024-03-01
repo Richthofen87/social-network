@@ -8,15 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.SignupDTO;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account_;
-import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
@@ -119,16 +117,16 @@ public class AccountService {
     }
 
     @Transactional
-    public Account createNewAccount(SignupDTO signupDTO) {
-        log.debug("Method createNewAccount(%s) started with param: \"%s\"".formatted(SignupDTO.class, signupDTO));
-        String email = signupDTO.getEmail();
+    public Account createNewAccount(RegistrationDto registrationDto) {
+        log.debug("Method createNewAccount(%s) started with param: \"%s\"".formatted(RegistrationDto.class, registrationDto));
+        String email = registrationDto.getEmail();
         if (accountRepository.findByEmail(email).isPresent())
             throw new EntityExistsException("Account with email: \"%s\" already exists".formatted(email));
         Account account = new Account();
-        account.setFirstName(signupDTO.getFirstName());
-        account.setLastName(signupDTO.getLastName());
+        account.setFirstName(registrationDto.getFirstName());
+        account.setLastName(registrationDto.getLastName());
         account.setEmail(email);
-        account.setPassword(passwordEncoder.encode(signupDTO.getPassword1()));
+        account.setPassword(passwordEncoder.encode(registrationDto.getPassword1()));
         account.setCreatedDate(ZonedDateTime.now());
         account.setRegDate(ZonedDateTime.now());
         account.addRole(roleService.getUserRole());

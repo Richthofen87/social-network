@@ -5,7 +5,9 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class SignupDTO {
+public class RegistrationDto {
+    private String id;
+    private boolean isDeleted;
     private String firstName;
     private String lastName;
     private String email;

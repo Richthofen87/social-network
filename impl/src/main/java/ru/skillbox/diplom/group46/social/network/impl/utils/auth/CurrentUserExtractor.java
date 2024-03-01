@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
-import ru.skillbox.diplom.group46.social.network.domain.user.User;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
 
 @Slf4j
 @Component
@@ -22,7 +22,7 @@ public class CurrentUserExtractor {
         staticExtractor = extractor;
     }
 
-    public static User getCurrentUser() {
+    public static UserDTO getCurrentUser() {
         log.debug("Method getCurrentUser() started");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return staticExtractor.getUserFromToken(((Jwt) authentication.getPrincipal()).getTokenValue());

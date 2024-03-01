@@ -3,9 +3,7 @@ package ru.skillbox.diplom.group46.social.network.api.resource.auth;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.LoginDTO;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.SignupDTO;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.TokenDTO;
+import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 
 @RestController
@@ -13,16 +11,31 @@ import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 public interface AuthController {
 
     @PostMapping("/register")
-    ResponseEntity<?> register(@RequestBody SignupDTO signupDTO);
+    ResponseEntity<?> register(@RequestBody RegistrationDto registrationDto);
 
-    @PostMapping("/login")
-    ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response);
+    @PostMapping("/refresh")
+    ResponseEntity<?> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto);
 
-    @PostMapping("/token")
-    ResponseEntity<?> token(@RequestBody TokenDTO tokenDTO);
+    /*@PostMapping("/password/recovery/{recoveryTokenId}")
+    ResponseEntity<String> recoverPassword(
+            @PathVariable("recoveryTokenId") String recoveryTokenId,
+            @RequestBody NewPasswordDto newPasswordDto
+    );
 
+    @PostMapping("/password/recovery")
+    ResponseEntity<?> sendRecoveryEmail(@RequestBody PasswordRecoveryDto passwordRecoveryDto);
+*/
     @PostMapping("/logout")
     ResponseEntity<?> logout(HttpServletResponse response);
+
+    @PostMapping("/login")
+    ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
+
+    /*@PostMapping("/change-password-link")
+    ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);
+
+    @PostMapping("/change-email-link")
+    ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);*/
 
     @GetMapping("/captcha")
     ResponseEntity<CaptchaDto> getCaptcha();
