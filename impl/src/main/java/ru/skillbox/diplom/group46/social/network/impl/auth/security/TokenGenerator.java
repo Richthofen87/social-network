@@ -62,7 +62,7 @@ public class TokenGenerator {
         if (principal instanceof UserDTO) {
             UserDTO userDTO = (UserDTO) principal;
             user = new CustomUserDetails();
-            user.setId(userDTO.getId());
+            user.setId(userDTO.getId().toString());
             user.setUsername(userDTO.getUsername());
         } else if (principal instanceof CustomUserDetails) {
             user = (CustomUserDetails) principal;

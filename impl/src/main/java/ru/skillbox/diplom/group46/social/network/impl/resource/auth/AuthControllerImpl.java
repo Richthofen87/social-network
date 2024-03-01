@@ -26,14 +26,32 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response) {
-        return ResponseEntity.ok(authService.createAuthToken(authenticateDto, response));
-    }
-
-    @Override
     public ResponseEntity<?> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto) {
         return ResponseEntity.ok(authService.refreshToken(authenticateResponseDto));
     }
+
+    /*@Override
+    public ResponseEntity<String> recoverPassword(
+            String recoveryTokenId,
+            @RequestBody NewPasswordDto newPasswordDto
+    ) {
+        ResponseEntity<?> response = authService.recoverPassword(recoveryTokenId, newPasswordDto);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok("Пароль успешно изменён");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверная или просроченная ссылка");
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> sendRecoveryEmail(PasswordRecoveryDto passwordRecoveryDto) {
+        ResponseEntity<?> response = authService.sendRecoveryEmail(passwordRecoveryDto);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok("Письмо на почту отправлено");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Нет пользователя с указанной почтой");
+        }
+    }*/
 
     @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
@@ -42,11 +60,11 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<CaptchaDto> getCaptcha() {
-        return ResponseEntity.ok(captchaService.getCaptcha());
+    public ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.createAuthToken(authenticateDto, response));
     }
 
-    @Override
+    /*@Override
     public ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto) {
         ResponseEntity<?> response = authService.changePassword(passwordChangeDto);
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -64,6 +82,11 @@ public class AuthControllerImpl implements AuthController {
         } else {
             return ResponseEntity.badRequest().body(response.getBody());
         }
+    }*/
+
+    @Override
+    public ResponseEntity<CaptchaDto> getCaptcha() {
+        return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
 }

@@ -55,6 +55,9 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto);
         if (!registrationDto.getPassword1().equals(registrationDto.getPassword2())) {
@@ -62,7 +65,88 @@ public class AuthService {
         }
 
         User user = userService.createNewUser(registrationDto);
-        return ResponseEntity.ok(new UserDTO(user.getId().toString(), user.getFirstName(), user.getEmail()));
+        return ResponseEntity.ok(new UserDTO(user.getId(), user.getFirstName(), user.getEmail()));
+    }
+
+    public AuthenticateResponseDto refreshToken(AuthenticateResponseDto authenticateResponseDto) {
+        Authentication authentication = jwtAuthenticationProvider.authenticate(
+                new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
+        Jwt jwt = (Jwt) authentication.getCredentials();
+
+        return tokenGenerator.createToken(authentication);
+    }
+
+    /*public ResponseEntity<?> recoverPassword(String recoveryTokenId, NewPasswordDto newPasswordDto) {
+        try {
+            User currentUser = CurrentUserExtractor.getCurrentUser();
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Пользователь не авторизован");
+            }
+
+            RecoveryToken recoveryToken = recoveryTokenRepository.findByToken(recoveryTokenId);
+            if (recoveryToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Неверная или просроченная ссылка для восстановления пароля");
+            }
+
+            if (!currentUser.getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Токен восстановления пароля не принадлежит текущему пользователю");
+            }
+
+            if (recoveryToken.isExpired()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Срок действия токена восстановления пароля истёк");
+            }
+
+            String newPassword = newPasswordDto.getPassword();
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(currentUser);
+
+            recoveryTokenRepository.delete(recoveryToken);
+
+            return ResponseEntity.ok(
+                    "Пароль успешно изменён");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    "Произошла ошибка восстановления пароля");
+        }
+    }
+
+    public ResponseEntity<?> sendRecoveryEmail(PasswordRecoveryDto passwordRecoveryDto) {
+        try {
+            String email = passwordRecoveryDto.getEmail();
+
+            User user = userService.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Нет пользователя с указанной почтой");
+            }
+
+            RecoveryToken recoveryToken = recoveryTokenService.generateToken(user);
+            emailService.sendRecoveryEmail(email, recoveryToken.getToken());
+
+            return ResponseEntity.ok("Письмо на почту отправлено");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Произошла ошибка отправки письма для восстановления пароля");
+        }
+    }*/
+
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        try {
+            SecurityContextHolder.clearContext();
+
+            Cookie cookie = new Cookie("access_token", null);
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            return ResponseEntity.ok("Выход из системы успешно выполнен");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AppError(HttpStatus.UNAUTHORIZED.value(), "Ошибка выхода из системы"));
+        }
     }
 
     public ResponseEntity<?> createAuthToken(AuthenticateDto authenticateDto, HttpServletResponse response) {
@@ -94,32 +178,7 @@ public class AuthService {
         }
     }
 
-    public AuthenticateResponseDto refreshToken(AuthenticateResponseDto authenticateResponseDto) {
-        Authentication authentication = jwtAuthenticationProvider.authenticate(
-                new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
-        Jwt jwt = (Jwt) authentication.getCredentials();
-
-        return tokenGenerator.createToken(authentication);
-    }
-
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        try {
-            SecurityContextHolder.clearContext();
-
-            Cookie cookie = new Cookie("access_token", null);
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-
-            return ResponseEntity.ok("Выход из системы успешно выполнен");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AppError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Ошибка выхода из системы"));
-        }
-    }
-
-    public ResponseEntity<?> changePassword(PasswordChangeDto passwordChangeDto) {
+    /*public ResponseEntity<?> changePassword(PasswordChangeDto passwordChangeDto) {
         User currentUser = CurrentUserExtractor.getCurrentUser();
         if (currentUser == null) {
             return ResponseEntity.badRequest().body(new AppError(
@@ -157,5 +216,5 @@ public class AuthService {
         userRepository.save(currentUser);
 
         return ResponseEntity.ok("Email успешно изменён");
-    }
+    }*/
 }

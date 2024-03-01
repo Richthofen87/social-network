@@ -13,22 +13,31 @@ public interface AuthController {
     @PostMapping("/register")
     ResponseEntity<?> register(@RequestBody RegistrationDto registrationDto);
 
-    @PostMapping("/login")
-    ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
-
     @PostMapping("/refresh")
     ResponseEntity<?> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto);
 
+    /*@PostMapping("/password/recovery/{recoveryTokenId}")
+    ResponseEntity<String> recoverPassword(
+            @PathVariable("recoveryTokenId") String recoveryTokenId,
+            @RequestBody NewPasswordDto newPasswordDto
+    );
+
+    @PostMapping("/password/recovery")
+    ResponseEntity<?> sendRecoveryEmail(@RequestBody PasswordRecoveryDto passwordRecoveryDto);
+*/
     @PostMapping("/logout")
     ResponseEntity<?> logout(HttpServletResponse response);
 
-    @GetMapping("/captcha")
-    ResponseEntity<CaptchaDto> getCaptcha();
+    @PostMapping("/login")
+    ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
 
-    @PostMapping("/change-password-link")
+    /*@PostMapping("/change-password-link")
     ResponseEntity<?> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);
 
     @PostMapping("/change-email-link")
-    ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);
+    ResponseEntity<?> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);*/
+
+    @GetMapping("/captcha")
+    ResponseEntity<CaptchaDto> getCaptcha();
 
 }
