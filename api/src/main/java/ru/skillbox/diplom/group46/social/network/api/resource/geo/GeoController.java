@@ -1,14 +1,16 @@
 package ru.skillbox.diplom.group46.social.network.api.resource.geo;
 
 
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.geo.CountryDto;
-
+import ru.skillbox.diplom.group46.social.network.domain.geo.Country;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -22,5 +24,5 @@ public interface GeoController  {
     ResponseEntity<List<CountryDto>> country();
 
     @GetMapping("/country/{countryId}/city")
-    ResponseEntity <List<CityDto>> city(@PathVariable UUID countryId);
+    ResponseEntity <Set<CityDto>> city(@PathVariable UUID countryId);
 }

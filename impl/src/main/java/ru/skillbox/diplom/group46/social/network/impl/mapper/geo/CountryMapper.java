@@ -8,9 +8,8 @@ import ru.skillbox.diplom.group46.social.network.domain.geo.Country;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = {CityMapper.class})
 public interface CountryMapper {
-    Country dtoToEntity(CountryDto countryDto);
-    CountryDto entityToDto(Country country);
-    List<CountryDto> entityListToDtoList(List <Country> countryList);
+    CountryDto countryToDto(Country country);
+    List<CountryDto> countryToDtoList(List<Country> countries);
 }

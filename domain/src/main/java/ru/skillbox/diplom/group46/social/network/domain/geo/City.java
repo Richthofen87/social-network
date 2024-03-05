@@ -13,6 +13,8 @@ import java.util.UUID;
 public class City extends BaseEntity {
     @Column(name = "title")
     private String title;
-    @Column(name = "country_id")
-    private UUID countryId;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 }

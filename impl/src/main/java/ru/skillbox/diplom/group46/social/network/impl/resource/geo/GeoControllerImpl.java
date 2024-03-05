@@ -15,7 +15,9 @@ import ru.skillbox.diplom.group46.social.network.impl.service.geo.GeoService;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
 @Slf4j
 @Component
 @RestController
@@ -25,21 +27,19 @@ public  class GeoControllerImpl implements GeoController {
     private final GeoService geoService;
     @Override
     public ResponseEntity<CountryDto> load() {
-        log.info("Start method - load");
-        return null;
+        log.info("GeoControllerImpl.load - start method");
+        return ResponseEntity.ok((CountryDto) geoService.load());
     }
 
     @Override
     public ResponseEntity<List<CountryDto>> country() {
-        log.info("Start method - country");
+        log.info("GeoControllerImpl.country - start method");
         return ResponseEntity.ok(geoService.getCountry());
     }
 
     @Override
-    public ResponseEntity<List<CityDto>> city(UUID countryId) {
-        log.info("Start method - city");
+    public ResponseEntity<Set<CityDto>> city(UUID countryId) {
+        log.info("GeoControllerImpl.city - start method");
         return ResponseEntity.ok(geoService.getCity(countryId));
     }
-
-
 }
