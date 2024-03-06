@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.auth.service.geo;
+package ru.skillbox.diplom.group46.social.network.impl.service.geo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

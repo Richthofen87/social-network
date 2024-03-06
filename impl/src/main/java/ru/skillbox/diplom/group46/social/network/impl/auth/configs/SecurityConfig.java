@@ -64,6 +64,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/secured").authenticated()
                         .requestMatchers("/info").authenticated()
+                        .requestMatchers("/api/v1/auth/admin/revokeUserTokens").authenticated()
+                        .requestMatchers("/admin/revokeAllTokens").authenticated()
+                        //.requestMatchers("/api/v1/auth/admin/revokeUserTokens").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/user").hasRole("USER")
                         .anyRequest().permitAll())
@@ -78,10 +81,6 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtRequestFilter, BearerTokenAuthenticationFilter.class)
 
-                /*.exceptionHandling((exceptions) ->
-                        exceptions
-                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())*/
         ;
         return http.build();
     }
@@ -141,4 +140,3 @@ public class SecurityConfig {
     }
 
 }
-

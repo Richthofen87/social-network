@@ -10,7 +10,7 @@ import ru.skillbox.diplom.group46.social.network.api.dto.friend.FriendCountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.friend.FriendController;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.friend.FriendService;
+import ru.skillbox.diplom.group46.social.network.impl.service.friend.FriendService;
 
 import java.util.*;
 

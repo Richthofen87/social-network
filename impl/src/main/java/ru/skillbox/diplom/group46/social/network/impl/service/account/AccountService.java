@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.auth.service.account;
+package ru.skillbox.diplom.group46.social.network.impl.service.account;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +17,7 @@ import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account_;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.role.RoleService;
+import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 

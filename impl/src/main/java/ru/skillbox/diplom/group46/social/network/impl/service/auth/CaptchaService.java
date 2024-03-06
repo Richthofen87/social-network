@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.auth.service.auth;
+package ru.skillbox.diplom.group46.social.network.impl.service.auth;
 
 import cn.apiclub.captcha.Captcha;
 import cn.apiclub.captcha.backgrounds.GradiatedBackgroundProducer;

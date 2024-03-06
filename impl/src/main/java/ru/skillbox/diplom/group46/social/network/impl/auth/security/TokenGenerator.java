@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group46.social.network.impl.auth.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,19 +14,20 @@ import ru.skillbox.diplom.group46.social.network.api.dto.auth.CustomUserDetails;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateResponseDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
+import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @Component
+@RequiredArgsConstructor
 public class TokenGenerator {
-    @Autowired
-    JwtEncoder accessTokenEncoder;
 
-    @Autowired
+    private final JwtEncoder accessTokenEncoder;
+
     @Qualifier("jwtRefreshTokenEncoder")
-    JwtEncoder refreshTokenEncoder;
+    private final JwtEncoder refreshTokenEncoder;
 
     private String createAccessToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -75,9 +77,10 @@ public class TokenGenerator {
             throw new BadCredentialsException("Principal is not of expected type");
         }
 
+        String accessToken;
         AuthenticateResponseDto authenticateResponseDto = new AuthenticateResponseDto();
-        authenticateResponseDto.setUserId(user.getId());
-        authenticateResponseDto.setAccessToken(createAccessToken(authentication));
+        accessToken = createAccessToken(authentication);
+        authenticateResponseDto.setAccessToken(accessToken);
 
         String refreshToken;
         if (authentication.getCredentials() instanceof Jwt jwt) {

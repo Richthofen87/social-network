@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group46.social.network.api.resource.post.PostController;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.post.CommentService;
-import ru.skillbox.diplom.group46.social.network.impl.auth.service.post.PostService;
+import ru.skillbox.diplom.group46.social.network.impl.service.post.CommentService;
+import ru.skillbox.diplom.group46.social.network.impl.service.post.PostService;
 import java.util.Set;
 
 

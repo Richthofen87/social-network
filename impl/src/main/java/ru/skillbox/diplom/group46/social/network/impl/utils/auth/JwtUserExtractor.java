@@ -20,7 +20,7 @@ public class JwtUserExtractor {
     public UserDTO getUserFromToken(String token) {
         JwtDecoder jwtDecoder = securityConfig.jwtAccessTokenDecoder();
         Jwt jwt = jwtDecoder.decode(token);
-        UserDTO userDTO = new UserDTO(UUID.randomUUID(), "username", "email");
+        UserDTO userDTO = new UserDTO(UUID.randomUUID(), "username", "pass", "email");
         userDTO.setId(UUID.fromString(jwt.getClaim("sub")));
         userDTO.setUsername(jwt.getClaim("username"));
         userDTO.setEmail(jwt.getClaim("email"));
