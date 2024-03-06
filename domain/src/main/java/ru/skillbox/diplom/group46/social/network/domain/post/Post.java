@@ -3,7 +3,7 @@ package ru.skillbox.diplom.group46.social.network.domain.post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
+import ru.skillbox.diplom.group46.social.network.domain.base.BaseAuditedEntity;
 import ru.skillbox.diplom.group46.social.network.domain.post.enums.Type;
 import ru.skillbox.diplom.group46.social.network.domain.tag.Tag;
 
@@ -15,7 +15,7 @@ import java.util.*;
 @Setter
 @Entity
 @Table(name = "post")
-public class Post extends BaseEntity {
+public class Post extends BaseAuditedEntity {
 
     @Column(nullable = false, name = "time")
     private ZonedDateTime time;

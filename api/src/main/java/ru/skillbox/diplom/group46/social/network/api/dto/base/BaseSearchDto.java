@@ -18,6 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BaseSearchDto {
     private String uuid;
-    private List<UUID> uuids;
+    private List<UUID> ids;
     private Boolean isDeleted;
 }

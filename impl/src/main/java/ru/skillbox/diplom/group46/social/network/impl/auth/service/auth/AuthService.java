@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.auth;
+package ru.skillbox.diplom.group46.social.network.impl.auth.service.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,10 +22,9 @@ import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.domain.user.role.Role;
 import ru.skillbox.diplom.group46.social.network.impl.auth.configs.JwtAuthenticationToken;
 import ru.skillbox.diplom.group46.social.network.impl.auth.security.TokenGenerator;
+import ru.skillbox.diplom.group46.social.network.impl.auth.service.role.RoleService;
+import ru.skillbox.diplom.group46.social.network.impl.auth.service.user.UserService;
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
-import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
-import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
-import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -17,7 +17,7 @@ public abstract class BaseEntity {
     private UUID id;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
 
 }

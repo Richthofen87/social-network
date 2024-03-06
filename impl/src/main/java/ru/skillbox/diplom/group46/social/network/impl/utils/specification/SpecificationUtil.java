@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group46.social.network.impl.utils.specification;
 import jakarta.persistence.metamodel.SingularAttribute;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,4 +48,8 @@ public class SpecificationUtil<T> {
                 builder.between(root.get(singularAttribute), comparable, comparableTwo);
     }
 
+    public static Specification equalValueUUIDList(SingularAttribute<BaseEntity, UUID> id, List<UUID> ids) {
+        return (root, query, builder) -> ids == null || ids.isEmpty() ? builder.conjunction() :
+                builder.in(root.get(id)).value(ids);
+    }
 }

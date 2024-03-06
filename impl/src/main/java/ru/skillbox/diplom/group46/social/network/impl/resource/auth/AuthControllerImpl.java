@@ -2,15 +2,14 @@ package ru.skillbox.diplom.group46.social.network.impl.resource.auth;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.auth.AuthController;
-import ru.skillbox.diplom.group46.social.network.impl.service.auth.AuthService;
-import ru.skillbox.diplom.group46.social.network.impl.service.auth.CaptchaService;
+import ru.skillbox.diplom.group46.social.network.impl.auth.service.auth.AuthService;
+import ru.skillbox.diplom.group46.social.network.impl.auth.service.auth.CaptchaService;
 
 
 @RestController

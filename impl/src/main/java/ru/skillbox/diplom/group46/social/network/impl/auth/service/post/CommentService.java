@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.post;
+package ru.skillbox.diplom.group46.social.network.impl.auth.service.post;
 
 import java.util.Set;
 import java.util.UUID;

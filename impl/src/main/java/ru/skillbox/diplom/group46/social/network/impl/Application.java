@@ -17,8 +17,6 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseReposi
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
     public static void main(String[] args) {
-
-
         SpringApplication.run(Application.class, args);
     }
 }

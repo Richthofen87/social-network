@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.post;
+package ru.skillbox.diplom.group46.social.network.impl.auth.service.post;
 
 import java.util.Set;
 import java.util.UUID;
@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.PostSearchDto;
@@ -19,13 +20,13 @@ import ru.skillbox.diplom.group46.social.network.impl.utils.specification.Specif
 
 @Slf4j
 @Service
-@Transactional
+
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
 
-
+    @Transactional
     public PostDto create(PostDto postDto) {
         log.info("PostService.create() StartMethod");
         Post post = postMapper.postDtoToPostEntity(postDto);
