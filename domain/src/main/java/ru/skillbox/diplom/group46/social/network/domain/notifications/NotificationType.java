@@ -1,0 +1,7 @@
+package ru.skillbox.diplom.group46.social.network.domain.notifications;
+
+public enum NotificationType {
+    LIKE, POST, POST_COMMENT, COMMENT_COMMENT, MESSAGE,
+    FRIEND_REQUEST, FRIEND_BIRTHDAY, SEND_EMAIL_MESSAGE,
+    FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_UNBLOCKED, FRIEND_SUBSCRIBE, USER_BIRTHDAY
+}

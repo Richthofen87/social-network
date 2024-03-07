@@ -3,6 +3,8 @@ package ru.skillbox.diplom.group46.social.network.api.dto.account;
 import lombok.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.base.BaseDto;
 
+import java.time.ZonedDateTime;
+
 /**
  * AccountDto
  *
@@ -24,15 +26,15 @@ public class AccountDto extends BaseDto {
     private String about;
     private String city;
     private String country;
-    private String regDate;
+    private ZonedDateTime regDate;
     private String statusCode;
-    private String birthDate;
+    private ZonedDateTime birthDate;
     private String messagePermission;
-    private String lastOnlineTime;
-    private String isOnline;
-    private String isBlocked;
+    private ZonedDateTime lastOnlineTime;
+    private Boolean isOnline;
+    private Boolean isBlocked;
     private String emojiStatus;
-    private String deletionTimestamp;
-    private String createdDate;
-    private String lastModifiedDate;
+    private ZonedDateTime deletionTimestamp;
+    private ZonedDateTime createdDate;
+    private ZonedDateTime lastModifiedDate;
 }

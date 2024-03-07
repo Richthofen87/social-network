@@ -5,9 +5,11 @@ import cn.apiclub.captcha.backgrounds.GradiatedBackgroundProducer;
 import cn.apiclub.captcha.noise.CurvedLineNoiseProducer;
 import cn.apiclub.captcha.text.producer.FiveLetterFirstNameTextProducer;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
@@ -65,9 +67,14 @@ public class CaptchaService {
                 .orElseThrow(() -> new EntityNotFoundException("Captcha with id: \"%s\" not found".formatted(captchaId)));
         if (!ZonedDateTime.now().isBefore(captcha.getIssuedAt().plus(EXPIRATION)))
             throw new CaptchaException("Captcha with id: \"%s\" has expired".formatted(captchaId));
-
         if (!registrationDto.getCaptchaCode().equals(captcha.getCode()))
-            throw new CaptchaException("Provided code \"%s\" for captcha with id: \"%s\" has expired"
+            throw new CaptchaException("Provided code \"%s\" is not valid for captcha with id: \"%s\""
                     .formatted(captcha.getCode(), captchaId));
+    }
+
+    @Transactional
+    @Scheduled(initialDelayString = "${captcha.checkDelay}", fixedDelayString = "${captcha.checkDelay}")
+    protected void clearCaptcha() {
+        repository.deleteByIssuedAtLessThan(ZonedDateTime.now().plus(EXPIRATION));
     }
 }

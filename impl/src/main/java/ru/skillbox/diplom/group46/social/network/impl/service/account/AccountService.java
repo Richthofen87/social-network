@@ -17,6 +17,7 @@ import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account_;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsService;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
@@ -39,6 +40,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
+    private final NotificationsService notificationsService;
 
     public AccountDto get() {
         log.debug("Method get started()");
@@ -100,6 +102,8 @@ public class AccountService {
     public Page<AccountDto> getAll(AccountSearchDto searchDto, Pageable pageable) {
         log.debug("Method getAll(%s, %s) started with params: \"%s\", \"%s\""
                 .formatted(AccountSearchDto.class, Pageable.class, searchDto, pageable));
+        String author;
+        String[] authorNames;
         Specification<Account> spec = SpecificationUtil
                 .equalValueUUID(Account_.id, searchDto.getUuid())
                 .and(SpecificationUtil.equalValue(Account_.isDeleted, searchDto.getIsDeleted()))
@@ -112,14 +116,26 @@ public class AccountService {
                 .and(SpecificationUtil.equalValue(Account_.statusCode, searchDto.getStatusCode()))
                 .and(SpecificationUtil.isBetween(Account_.birthDate, searchDto.getAgeFrom(), searchDto.getAgeTo()))
                 .and(SpecificationUtil.isLessValue(Account_.birthDate, searchDto.getAgeTo()))
+<<<<<<< HEAD
                 .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()))
                 .and(SpecificationUtil.equalValueUUIDList(Account_.id, searchDto.getIds()));
+=======
+                .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()));
+        if ((author = searchDto.getAuthor()) != null && !author.isBlank()) {
+            authorNames = author.split(" ");
+            if (authorNames.length == 2)
+                spec = spec.and(SpecificationUtil.equalValue(Account_.firstName, authorNames[0]))
+                        .or(SpecificationUtil.equalValue(Account_.lastName, authorNames[1]));
+            else spec = spec.and(SpecificationUtil.equalValue(Account_.firstName, authorNames[0]));
+        }
+>>>>>>> 86c395e (Создан сервис уведомлений и настроек пользователей, добавлена функция периодического очищения капчи из бд)
         return accountRepository.findAll(spec, pageable).map(accountMapper::entityToDto);
     }
 
     @Transactional
     public Account createNewAccount(RegistrationDto registrationDto) {
-        log.debug("Method createNewAccount(%s) started with param: \"%s\"".formatted(RegistrationDto.class, registrationDto));
+        log.debug("Method createNewAccount(%s) started with param: \"%s\""
+                .formatted(RegistrationDto.class, registrationDto));
         String email = registrationDto.getEmail();
         if (accountRepository.findByEmail(email).isPresent())
             throw new EntityExistsException("Account with email: \"%s\" already exists".formatted(email));
@@ -131,7 +147,9 @@ public class AccountService {
         account.setCreatedDate(ZonedDateTime.now());
         account.setRegDate(ZonedDateTime.now());
         account.addRole(roleService.getUserRole());
-        return accountRepository.save(account);
+        accountRepository.save(account);
+        notificationsService.setSettings(account.getId().toString());
+        return account;
     }
 
     private Account getCurrentUserAccount() {

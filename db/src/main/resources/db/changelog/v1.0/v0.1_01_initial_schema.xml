@@ -84,4 +84,44 @@
         </loadData>
     </changeSet>
 
+    <changeSet id="create notification table" author="vladimir.sazonov">
+        <createTable tableName="notification">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValue="false"/>
+            <column name="author_id" type="uuid"/>
+            <column name="receiver_id" type="uuid"/>
+            <column name="content" type="varchar(255)"/>
+            <column name="notification_type" type="varchar(255)"/>
+            <column name="sent_time" type="timestamptz"/>
+            <column name="status" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create settings table" author="vladimir.sazonov">
+        <createTable tableName="settings">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValue="false"/>
+            <column name="account_id" type="uuid">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="enable_like" type="boolean"/>
+            <column name="enable_post" type="boolean"/>
+            <column name="enable_post_comment" type="boolean"/>
+            <column name="enable_comment_comment" type="boolean"/>
+            <column name="enable_message" type="boolean"/>
+            <column name="enable_friend_request" type="boolean"/>
+            <column name="enable_friend_birthday" type="boolean"/>
+            <column name="enable_send_email_message" type="boolean"/>
+            <column name="enable_friend_approve" type="boolean"/>
+            <column name="enable_friend_blocked" type="boolean"/>
+            <column name="enable_friend_unblocked" type="boolean"/>
+            <column name="enable_friend_subscribe" type="boolean"/>
+            <column name="enable_user_birthday" type="boolean"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

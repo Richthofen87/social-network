@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor

@@ -42,7 +42,8 @@ spring:
     open-in-view: false
 
 captcha:
-  expiration: 5m
+  expiration: PT5M
+  checkDelay: PT1M
 
 access-token:
   private: ${ACCESS_TOKEN_PRIVATE_KEY_PATH}
