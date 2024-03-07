@@ -28,15 +28,10 @@ public class ExceptionAdvice {
     public ErrorResponse handleAuthException(Throwable ex) {
         log.warn("Method handleAuthException(%s) started with param: \"%s\", cause: \"%s\""
                 .formatted(Throwable.class, ex, ex.getCause()));
-
         if (ex instanceof AuthenticationError) {
             AuthenticationError authError = (AuthenticationError) ex;
             log.warn("AuthenticationError: status={}, message={}", authError.getStatus(), authError.getMessage());
         }
-
         return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
-
-
-
 }

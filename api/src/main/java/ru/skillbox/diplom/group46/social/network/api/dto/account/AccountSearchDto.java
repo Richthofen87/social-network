@@ -17,6 +17,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class AccountSearchDto extends BaseSearchDto {
     private List<String> blockedByIds;
+    private String author;
     private String firstName;
     private String lastName;
     private String city;

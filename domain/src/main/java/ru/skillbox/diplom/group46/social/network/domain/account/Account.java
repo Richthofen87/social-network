@@ -2,6 +2,8 @@ package ru.skillbox.diplom.group46.social.network.domain.account;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import ru.skillbox.diplom.group46.social.network.domain.account.status_code.StatusCode;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
@@ -39,6 +41,7 @@ public class Account extends User {
     @Column(name = "country")
     private String country;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status_code")
     private StatusCode statusCode;
 

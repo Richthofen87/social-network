@@ -13,6 +13,7 @@ import java.time.ZoneId;
 public abstract class AccountMapper {
 
     public abstract Account dtoToEntity(AccountDto accountDto);
+    @Mapping(target = "isDeleted", defaultValue = "false")
     public abstract AccountDto entityToDto(Account account);
     public abstract void update(@MappingTarget Account account, AccountDto accountDto);
 }

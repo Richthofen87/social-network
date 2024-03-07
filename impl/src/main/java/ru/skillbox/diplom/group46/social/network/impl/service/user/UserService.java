@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
@@ -27,13 +26,5 @@ public class UserService {
     public User findByEmail(String email) {
         log.debug("Method findByEmail(%s) started with param: \"%s\"".formatted(String.class, email));
         return userRepository.findByEmail(email).orElse(null);
-    }
-
-    public User convertUserDtoToUser(UserDTO userDto) {
-        User user = new User();
-        user.setId(userDto.getId());
-        user.setFirstName(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        return user;
     }
 }
