@@ -6,12 +6,11 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <property name="schema" value="public"/>
-
     <include file="db/changelog/v1.0/geoService.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/postAndcoment_schema.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/postAndComment_schema_v2.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/v0.1_01_initial_schema.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/friend_schema.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/v1.1_create_recovery_token_table.xml" relativeToChangelogFile="true"/>
-
-   </databaseChangeLog>
+    <include file="db/changelog/v1.0/audit.xml" relativeToChangelogFile="true"/>
+</databaseChangeLog>

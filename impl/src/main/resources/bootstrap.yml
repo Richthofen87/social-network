@@ -1,19 +1,25 @@
 spring:
   application:
     name: microservice-social-network
-
+  config:
+    activate:
+      on-profile: local
   cloud:
     kubernetes:
+      enabled: false
       secrets:
         sources:
           - name: microservice-social-network
+            namespace: skillbox-group-46
       config:
         sources:
-          - name: library-core
+#          - name: library-core
           - name: microservice-social-network
+            namespace: skillbox-group-46
       reload:
         enabled: true
-
+      client:
+        namespace: skillbox-group-46
 management:
   endpoint:
     restart:

@@ -147,8 +147,9 @@ public class FriendService {
     @Transactional(readOnly = true)
     //Получение списока id всех друзей текущего пользователя
     public Set<UUID> getFriendIds() {
+        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
         log.info("FriendService.getFriendIds() StartMethod");
-        return friendRepository.getFriendAuthor(CurrentUserExtractor.getCurrentUser().getId(), StatusCode.FRIEND.toString());
+        return friendRepository.getFriendAuthor(authorId, StatusCode.FRIEND.toString());
     }
     @Transactional(readOnly = true)
     //Получение списока id всех друзей пользователя по его id
