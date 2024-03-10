@@ -105,7 +105,7 @@ public class AccountService {
         String author;
         String[] authorNames;
         Specification<Account> spec = SpecificationUtil
-                .equalValueUUID(Account_.id, searchDto.getUuid())
+                .equalValueUUID(Account_.id, searchDto.getId())
                 .and(SpecificationUtil.equalValue(Account_.isDeleted, searchDto.getIsDeleted()))
                 .and(SpecificationUtil.equalValue(Account_.firstName, searchDto.getFirstName()))
                 .and(SpecificationUtil.equalValue(Account_.lastName, searchDto.getLastName()))
@@ -116,19 +116,14 @@ public class AccountService {
                 .and(SpecificationUtil.equalValue(Account_.statusCode, searchDto.getStatusCode()))
                 .and(SpecificationUtil.isBetween(Account_.birthDate, searchDto.getAgeFrom(), searchDto.getAgeTo()))
                 .and(SpecificationUtil.isLessValue(Account_.birthDate, searchDto.getAgeTo()))
-<<<<<<< HEAD
-                .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()))
-                .and(SpecificationUtil.equalValueUUIDList(Account_.id, searchDto.getIds()));
-=======
                 .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()));
         if ((author = searchDto.getAuthor()) != null && !author.isBlank()) {
             authorNames = author.split(" ");
             if (authorNames.length == 2)
                 spec = spec.and(SpecificationUtil.equalValue(Account_.firstName, authorNames[0]))
-                        .or(SpecificationUtil.equalValue(Account_.lastName, authorNames[1]));
+                        .and(SpecificationUtil.equalValue(Account_.lastName, authorNames[1]));
             else spec = spec.and(SpecificationUtil.equalValue(Account_.firstName, authorNames[0]));
         }
->>>>>>> 86c395e (Создан сервис уведомлений и настроек пользователей, добавлена функция периодического очищения капчи из бд)
         return accountRepository.findAll(spec, pageable).map(accountMapper::entityToDto);
     }
 

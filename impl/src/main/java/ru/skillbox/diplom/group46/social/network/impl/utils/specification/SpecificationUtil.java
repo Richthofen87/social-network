@@ -15,9 +15,8 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> object == null ? null : builder.equal(root.get(singularAttribute), object);
     }
 
-    public static Specification equalValueUUID(SingularAttribute attribute, String value) {
-        return (root, query, builder) -> value == null ? null : builder.equal(root.get(attribute),
-                UUID.fromString(value));
+    public static Specification equalValueUUID(SingularAttribute attribute, UUID value) {
+        return (root, query, builder) -> value == null ? null : builder.equal(root.get(attribute), value);
     }
 
     public static Specification inListJoin(List<String> tags, String tableName, String columnName) {

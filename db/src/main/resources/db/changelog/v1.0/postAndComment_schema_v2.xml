@@ -1,0 +1,42 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="modify_column_types" author="ivan.kazantsev">
+        <modifyDataType tableName="post" columnName="my_like" newDataType="java.lang.Boolean"/>
+        <modifyDataType tableName="comment" columnName="is_blocked" newDataType="java.lang.Boolean"/>
+        <modifyDataType tableName="comment" columnName="my_like" newDataType="java.lang.Boolean"/>
+        <modifyDataType tableName="likes" columnName="author_id" newDataType="java.util.UUID"/>
+        <modifyDataType tableName="likes" columnName="item_id" newDataType="java.util.UUID"/>
+        <addColumn tableName="post">
+            <column name="author_id" type="uuid"/>
+            <column name="with_friends" type="java.lang.Boolean"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_post_and_comment_id_to_likes" author="ilya.kukushkin">
+        <addColumn tableName="likes">
+            <column name="post_id" type="uuid"/>
+            <column name="comment_id" type="uuid"/>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseTableName="likes"
+                baseColumnNames="post_id"
+                constraintName="fk_likes_post_id"
+                referencedTableName="post"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="likes"
+                baseColumnNames="comment_id"
+                constraintName="fk_likes_comment_id"
+                referencedTableName="comment"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

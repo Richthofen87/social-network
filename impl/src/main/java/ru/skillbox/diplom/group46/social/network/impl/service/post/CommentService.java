@@ -1,24 +1,33 @@
 package ru.skillbox.diplom.group46.social.network.impl.service.post;
 
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.CommentDto;
-import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.CommentSearchDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.post.LikeDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeDto;
+import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment_;
-import ru.skillbox.diplom.group46.social.network.domain.post.Post;
+import ru.skillbox.diplom.group46.social.network.domain.post.Like;
+import ru.skillbox.diplom.group46.social.network.domain.post.enums.CommentType;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.post.CommentMapper;
+import ru.skillbox.diplom.group46.social.network.impl.mapper.post.LikeMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.CommentRepository;
+import ru.skillbox.diplom.group46.social.network.impl.repository.post.LikeRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.PostRepository;
+import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,54 +38,101 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
+    private final LikeMapper likeMapper;
 
 
-    public CommentDto createComment(String postId, CommentDto commentDTO) {
-        Post post = postRepository.findById(UUID.fromString(postId)).get();
-        AtomicInteger count = new AtomicInteger(post.getCommentsCount());
-        post.setCommentsCount(count.incrementAndGet());
-        postRepository.save(post);
+    public CommentDto createComment(UUID postId, CommentDto commentDto) {
+        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
+        commentDto.setCommentType(CommentTypeDto.POST);
+        commentDto.setParentId(postId);
+        commentDto.setPostId(postId);
 
-        Comment commentDtoToEntity = commentMapper.createCommentDtoToEntity(UUID.fromString(postId), commentDTO);
-        Comment savedComment = commentRepository.save(commentDtoToEntity);
+        Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
+        comment.setPost(postRepository.getById(postId));
+        return commentMapper.commentToCommentDto(commentRepository.save(comment));
+    }
 
-        return commentMapper.entityToDto(savedComment);
+    public LikeDto addLikeToComment(UUID commentId) {
+        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+
+        Like existingLike = likeRepository.findByCommentIdAndAuthorId(commentId, authorId);
+        if (existingLike != null) {
+            existingLike.setIsDeleted(false);
+            return likeMapper.likeToLikeDto(likeRepository.save(existingLike));
+        }
+
+        Like like = new Like();
+        like.setIsDeleted(false);
+        like.setAuthorId(authorId);
+        like.setItemId(commentId);
+        like.setTime(ZonedDateTime.now());
+        like.setType(CommentType.COMMENT);
+        like.setComment(commentRepository.getById(commentId));
+
+        return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
 
 
-    public CommentDto updateComment(CommentDto commentDTO) {
-        return commentMapper.entityToDto(commentRepository.saveAndFlush(commentMapper
-                .updateCommentDtoToEntity(commentDTO, commentRepository.getById(commentDTO.getId()))));
+    public LikeDto deleteLikeToComment(UUID commentId) {
+        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        Like like = likeRepository.findByCommentIdAndAuthorIdAndTypeAndIsDeletedFalse(commentId, authorId, CommentType.COMMENT);
+        like.setIsDeleted(true);
+        return likeMapper.likeToLikeDto(likeRepository.save(like));
+    }
+
+
+    public CommentDto updateComment(CommentDto commentDTO, UUID postId) {
+        CommentDto commentDto = commentMapper.commentToCommentDto(commentRepository.saveAndFlush(commentMapper
+                .updateCommentDtoToEntity(commentDTO, commentRepository.getById(postId))));
+        commentDto.setCommentsCount(commentRepository.commentCount(postId));
+        return commentDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CommentDto> getComments(CommentSearchDto commentSearchDTO, Pageable pageable) {
+        Specification<Comment> specification = Specification
+                .where(SpecificationUtil.equalValue(Comment_.parentId, commentSearchDTO.getPostId()))
+                .and(SpecificationUtil.equalValue(Comment_.isDeleted, commentSearchDTO.getIsDeleted()));
+
+        return getCommentDtoPage(commentSearchDTO, pageable, specification);
     }
 
 
     @Transactional(readOnly = true)
-    public Set<CommentDto> getComments(CommentSearchDto commentSearchDTO, Pageable pageable) {
-        Specification specification = createSpecification(commentSearchDTO);
-        return commentMapper.entityListToDtoList(commentRepository.findAll(specification, pageable).toSet());
-    }
+    public Page<CommentDto> getSubComments(CommentSearchDto commentSearchDTO, Pageable pageable) {
+        Specification<Comment> specification = Specification
+                .where(SpecificationUtil.equalValue(Comment_.parentId, commentSearchDTO.getCommentId())
+                        .and(SpecificationUtil.equalValue(Comment_.isDeleted, commentSearchDTO.getIsDeleted())));
 
-    @Transactional(readOnly = true)
-    public Set<CommentDto> getSubComments(CommentSearchDto commentSearchDTO, Pageable pageable) {
-        Specification specification = createSpecification(commentSearchDTO);
-        return commentMapper.entityListToDtoList(commentRepository.findAll(specification, pageable).toSet());
+        return getCommentDtoPage(commentSearchDTO, pageable, specification);
     }
 
 
-    public CommentDto createSubComment(CommentDto commentDto, String commentId) {
-        Comment commentDtoToEntity = commentMapper.createCommentDtoToEntity(UUID.fromString(commentId), commentDto);
-        Comment savedComment = commentRepository.save(commentDtoToEntity);
+    private Page<CommentDto> getCommentDtoPage(CommentSearchDto commentSearchDTO, Pageable pageable, Specification<Comment> specification) {
+        Page<Comment> comments = commentRepository.findAll(specification, pageable);
 
-        return commentMapper.entityToDto(savedComment);
+        List<CommentDto> commentDtos = comments.getContent().stream()
+                .map(commentMapper::commentToCommentDto)
+                .collect(Collectors.toList());
+
+        commentDtos.forEach(commentDto -> {
+            commentDto.setCommentsCount(commentRepository.commentCount(commentDto.getId()));
+            commentDto.setLikeAmount(likeRepository.likeCount(commentDto.getId()));
+        });
+
+        return new PageImpl<>(commentDtos, pageable, comments.getTotalElements());
     }
 
-    private Specification createSpecification(CommentSearchDto commentSearchDTO) {
-        return SpecificationUtil
-                .equalValue(Comment_.isDeleted, commentSearchDTO.getIsDeleted())
-                .and(SpecificationUtil.equalValue(Comment_.commentType, commentSearchDTO.getCommentType()))
-                .and(SpecificationUtil.equalValueUUID(Comment_.authorId, commentSearchDTO.getAuthorId()))
-                .and(SpecificationUtil.equalValueUUID(Comment_.parentId, commentSearchDTO.getParentId()))
-                .and(SpecificationUtil.equalValueUUID(Comment_.postId, commentSearchDTO.getPostId()))
-                .and(SpecificationUtil.equalValueUUID(Comment_.id, commentSearchDTO.getCommentId()));
+
+    public CommentDto createSubComment(CommentDto commentDto, UUID postId, UUID commentId) {
+        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
+        commentDto.setCommentType(CommentTypeDto.COMMENT);
+        commentDto.setParentId(commentId);
+        commentDto.setPostId(postId);
+
+        Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
+        comment.setPost(postRepository.getById(postId));
+        return commentMapper.commentToCommentDto(commentRepository.save(comment));
     }
 }

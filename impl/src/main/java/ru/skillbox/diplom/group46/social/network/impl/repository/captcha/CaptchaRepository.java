@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface CaptchaRepository extends JpaRepository<CaptchaEntity, UUID> {
 
-    void deleteByIssuedAtLessThan(ZonedDateTime expiredDateTime);
+    void deleteByIssuedAtGreaterThanEqual(ZonedDateTime expiredDateTime);
 }

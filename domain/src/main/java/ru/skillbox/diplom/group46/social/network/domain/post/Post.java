@@ -6,8 +6,6 @@ import lombok.Setter;
 import ru.skillbox.diplom.group46.social.network.domain.base.BaseAuditedEntity;
 import ru.skillbox.diplom.group46.social.network.domain.post.enums.Type;
 import ru.skillbox.diplom.group46.social.network.domain.tag.Tag;
-
-
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -23,10 +21,13 @@ public class Post extends BaseAuditedEntity {
     @Column(nullable = false, name = "time_changed")
     private ZonedDateTime timeChanged;
 
+    @Column(name = "author_id")
+    private UUID authorId;
+
     @Column(nullable = false, name = "title")
     private String title;
 
-    @Column(nullable = false, name = "type")
+    @Column(nullable = true, name = "type")
     @Enumerated(EnumType.STRING)
     private Type type;
 
@@ -34,23 +35,16 @@ public class Post extends BaseAuditedEntity {
     private String postText;
 
     @Column(nullable = false, name = "is_blocked")
-    private boolean isBlocked;
-
-    @Column(nullable = false, name = "comments_count")
-    private Integer commentsCount;
-
-    @Column(name = "reaction_type")
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<LikeReaction> reactionType;
+    private Boolean isBlocked;
 
     @Column(name = "my_reaction")
     private String myReaction;
 
-    @Column(name = "like_amount")
-    private Integer likeAmount;
-
     @Column(name = "my_like")
-    private boolean myLike;
+    private Boolean myLike;
+
+    @Column(name = "with_friends")
+    private Boolean withFriends;
 
     @Column(name = "image_path")
     private String imagePath;
@@ -69,5 +63,12 @@ public class Post extends BaseAuditedEntity {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new HashSet<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Comment> comments = new HashSet<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private Set<Like> likes = new HashSet<>();
+
 }

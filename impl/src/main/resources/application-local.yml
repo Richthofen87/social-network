@@ -7,6 +7,22 @@ spring:
       client:
         enabled: false
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL}
+    password: ${PASSWORD_MAIL}
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    sender:
+      email: no-reply@example.com
+      text: no-reply
+
   cloud:
     kubernetes:
       config:
@@ -16,17 +32,24 @@ spring:
 
   liquibase:
     enabled: true
-    drop-first: true
-#    default-schema: social-network
-#    liquibase-schema: social-network
+    drop-first: false
+    default-schema: public
+    liquibase-schema: public
+    change-log: classpath:database-social.network-changelog.xml
 
   datasource:
-      url: jdbc:postgresql://localhost:5432/social-network
-      username: social-network
-      password: social-network
-      driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://db:5432/social-network
+    username: social-network
+    password: social-network
+    driverClassName: org.postgresql.Driver
 
-ACCESS_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/access-token-private.key"
-ACCESS_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/access-token-public.key"
-REFRESH_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/refresh-token-private.key"
-REFRESH_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/refresh-token-public.key"
+captcha:
+  expiration: PT5M
+  checkDelay: PT1M
+
+access-token:
+  private: ${ACCESS_TOKEN_PRIVATE_KEY_PATH}
+  public: ${ACCESS_TOKEN_PUBLIC_KEY_PATH}
+refresh-token:
+  private: ${REFRESH_TOKEN_PRIVATE_KEY_PATH}
+  public: ${REFRESH_TOKEN_PUBLIC_KEY_PATH}

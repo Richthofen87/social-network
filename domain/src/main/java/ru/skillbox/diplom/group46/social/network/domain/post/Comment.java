@@ -3,10 +3,14 @@ package ru.skillbox.diplom.group46.social.network.domain.post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
 import ru.skillbox.diplom.group46.social.network.domain.post.enums.CommentType;
 
+
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -34,21 +38,21 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, name = "comment_text")
     private String commentText;
 
-    @Column(nullable = false, name = "post_id")
-    private UUID postId;
-
     @Column(nullable = false, name = "is_blocked")
     private Boolean isBlocked;
-
-    @Column(nullable = false, name = "like_amount")
-    private Integer likeAmount;
 
     @Column(nullable = false, name = "my_like")
     private Boolean myLike;
 
-    @Column(nullable = false, name = "comments_count")
-    private Integer commentsCount;
-
     @Column(name = "image_path")
     private String imagePath;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private Set<Like> likes = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+
 }

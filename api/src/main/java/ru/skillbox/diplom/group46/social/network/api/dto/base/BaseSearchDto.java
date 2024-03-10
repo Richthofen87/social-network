@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class BaseSearchDto {
-    private String uuid;
+    private UUID id;
     private List<UUID> ids;
     private Boolean isDeleted;
 }

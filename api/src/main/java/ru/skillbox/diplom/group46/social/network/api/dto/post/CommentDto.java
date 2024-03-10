@@ -2,18 +2,19 @@ package ru.skillbox.diplom.group46.social.network.api.dto.post;
 
 import lombok.Data;
 import ru.skillbox.diplom.group46.social.network.api.dto.base.BaseDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentType;
+import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeDto;
+import java.util.UUID;
 
 @Data
 public class CommentDto extends BaseDto {
 
-    private CommentType commentType;
+    private CommentTypeDto commentType;
     private String time;
     private String timeChanged;
-    private String authorId;
-    private String parentId;
+    private UUID authorId;
+    private UUID parentId;
     private String commentText;
-    private String postId;
+    private UUID postId;
     private Boolean isBlocked;
     private Integer likeAmount;
     private Boolean myLike;
