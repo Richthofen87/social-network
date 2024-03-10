@@ -5,5 +5,10 @@ import lombok.Data;
 @Data
 public class LikeReactionDto {
     private String reactionType;
-    private Integer count;
+    private Long count;
+
+    public LikeReactionDto(String reactionType, Long count) {
+        this.reactionType = reactionType;
+        this.count = count;
+    }
 }

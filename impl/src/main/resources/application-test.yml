@@ -12,5 +12,5 @@ spring:
   liquibase:
     enabled: true
     drop-first: true
-#    default-schema: public
+    default-schema: public
     liquibase-schema: public

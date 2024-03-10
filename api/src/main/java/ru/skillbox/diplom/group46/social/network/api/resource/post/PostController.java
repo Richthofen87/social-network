@@ -1,18 +1,18 @@
 package ru.skillbox.diplom.group46.social.network.api.resource.post;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.*;
 
-import java.util.Set;
+import java.util.UUID;
 
-@RestController
 @RequestMapping("/api/v1/post")
 public interface PostController {
 
     @GetMapping
-    ResponseEntity<Set<PostDto>> get(PostSearchDto postSearchDto, Pageable pageable);
+    ResponseEntity<Page<PostDto>> get(PostSearchDto postSearchDto, Pageable pageable);
 
     @PutMapping
     ResponseEntity<PostDto> update(@RequestBody PostDto postDto);
@@ -21,45 +21,47 @@ public interface PostController {
     ResponseEntity<PostDto> post(@RequestBody PostDto postDto);
 
     @PutMapping("{id}/comment")
-    ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto);
+    ResponseEntity<CommentDto> updateComment(@PathVariable UUID id, @RequestBody CommentDto commentDto);
 
     @PostMapping("{id}/comment")
-    ResponseEntity<CommentDto> createComment(@PathVariable String id, @RequestBody CommentDto commentDto);
+    ResponseEntity<CommentDto> createComment(@PathVariable UUID id, @RequestBody CommentDto commentDto);
 
     @PutMapping("{id}/comment/{commentId}")
-    ResponseEntity<CommentDto> createSubComment(@RequestBody CommentDto commentDto, @PathVariable String commentId);
+    ResponseEntity<CommentDto> createSubComment(@RequestBody CommentDto commentDto,
+                                                @PathVariable UUID id,
+                                                @PathVariable UUID commentId);
 
     @DeleteMapping("{id}/comment/{commentId}")
-    ResponseEntity<Void> deleteComment(@PathVariable String id, @PathVariable String commentId);
+    ResponseEntity<String> deleteComment(@PathVariable UUID commentId);
 
     @PutMapping("delayed")
     ResponseEntity<Void> updateDelayedPost(@RequestBody PostDto post);
 
     @PostMapping("{id}/like")
-    ResponseEntity<LikeDto> likePost(@PathVariable String id);
+    ResponseEntity<LikeDto> likePost(@PathVariable UUID id, @RequestBody LikeDto likeDto);
 
     @DeleteMapping("{id}/like")
-    ResponseEntity<Void> unlikePost(@PathVariable String id);
+    ResponseEntity<LikeDto> unlikePost(@PathVariable UUID id);
 
     @PostMapping("{id}/comment/{commentId}/like")
-    ResponseEntity<Void> likeComment(@PathVariable String id, @PathVariable String commentId);
+    ResponseEntity<LikeDto> likeComment(@PathVariable UUID commentId);
 
     @DeleteMapping("{id}/comment/{commentId}/like")
-    ResponseEntity<Void> unlikeComment(@PathVariable String id, @PathVariable String commentId);
+    ResponseEntity<LikeDto> unlikeComment(@PathVariable UUID commentId);
 
     @GetMapping("{postId}/comment")
-    ResponseEntity<Set<CommentDto>> getComments(@RequestBody CommentSearchDto commentSearchDTO,
-                                                        Pageable pageable);
+    ResponseEntity<Page<CommentDto>> getComments(CommentSearchDto commentSearchDTO,
+                                                Pageable pageable);
 
     @GetMapping("{postId}/comment/{commentId}/subcomment")
-    ResponseEntity<Set<CommentDto>> getSubComments(@RequestBody CommentSearchDto commentSearchDto,
+    ResponseEntity<Page<CommentDto>> getSubComments(CommentSearchDto commentSearchDto,
                                                    Pageable pageable);
 
     @GetMapping("{id}")
     ResponseEntity<PostDto> getPost(@PathVariable String id);
 
     @DeleteMapping("{id}")
-    ResponseEntity<Void> deletePost(@PathVariable String id);
+    ResponseEntity<String> deletePost(@PathVariable UUID id);
 }
 
 

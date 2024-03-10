@@ -7,8 +7,7 @@ import java.util.Set;
 
 @Data
 public class FriendSearchDto extends BaseSearchDto {
-    private String id;
-    private boolean isDeleted;
+
     private Set<String> friendIds;
     private String idFrom;
     private String idTo;

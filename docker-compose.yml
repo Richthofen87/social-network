@@ -1,18 +1,27 @@
-version: '1.0'
+version: '3'
 services:
+
   social-network:
     container_name: social-network
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: skillboxgroup46/social-network:v1.0.0
     ports:
       - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/social-network
+      SPRING_DATASOURCE_USERNAME: social-network
+      SPRING_DATASOURCE_PASSWORD: social-network
+      MAIL: "timullkaebay@gmail.com"
+      PASSWORD_MAIL: "qxux ibsj uhsn jnio"
+      ACCESS_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/access-token-private.key"
+      ACCESS_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/access-token-public.key"
+      REFRESH_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/refresh-token-private.key"
+      REFRESH_TOKEN_PUBLIC_KEY_PATH: "access-refresh-token-keys/refresh-token-public.key"
     depends_on:
       - db
+
   db:
     container_name: db
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: social-network
       POSTGRES_PASSWORD: social-network

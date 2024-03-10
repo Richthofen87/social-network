@@ -75,6 +75,6 @@ public class CaptchaService {
     @Transactional
     @Scheduled(initialDelayString = "${captcha.checkDelay}", fixedDelayString = "${captcha.checkDelay}")
     protected void clearCaptcha() {
-        repository.deleteByIssuedAtLessThan(ZonedDateTime.now().plus(EXPIRATION));
+        repository.deleteByIssuedAtGreaterThanEqual(ZonedDateTime.now().plus(EXPIRATION));
     }
 }

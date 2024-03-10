@@ -1,0 +1,49 @@
+stages:
+  - build-jar
+  - deploy-docker
+
+cache:
+  paths:
+    - .m2/repository
+  key: "$CI_COMMIT_SHA"
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_OPTS_CLI: "--batch-mode --show-version"
+
+jar-build:
+  stage: build-jar
+  image: maven:3.8.3-openjdk-17
+  tags:
+    - group46
+  script:
+    - echo "Building application..."
+    - mvn clean package $MAVEN_OPTS_CLI -DskipTests
+    - echo "Application built successfully."
+  only:
+    - develop
+    - merge_requests
+  artifacts:
+    paths:
+      - impl/target/network-impl-1.0.0-SNAPSHOT-spring-boot.jar
+
+docker-deploy:
+  stage: deploy-docker
+  image: docker:24.0.5
+  tags:
+    - group46
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - echo "Login successful"
+
+    - echo "Building docker image..."
+    - docker build -t skillboxgroup46/social-network:v1.0.0 -f impl/Dockerfile .
+    - echo "Application built successfully"
+
+    - echo "Pushing docker image..."
+    - docker push skillboxgroup46/social-network:v1.0.0
+    - echo "Application pushed successfully"
+  only:
+    - develop
