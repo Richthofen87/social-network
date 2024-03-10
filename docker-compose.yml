@@ -10,6 +10,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/social-network
       SPRING_DATASOURCE_USERNAME: social-network
       SPRING_DATASOURCE_PASSWORD: social-network
+      SPRING_CONFIG_LOCATION: classpath:/application-local.yml
       MAIL: "timullkaebay@gmail.com"
       PASSWORD_MAIL: "qxux ibsj uhsn jnio"
       ACCESS_TOKEN_PRIVATE_KEY_PATH: "access-refresh-token-keys/access-token-private.key"

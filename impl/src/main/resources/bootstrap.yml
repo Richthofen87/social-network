@@ -1,12 +1,9 @@
 spring:
   application:
     name: microservice-social-network
-  config:
-    activate:
-      on-profile: local
   cloud:
     kubernetes:
-      enabled: false
+      enabled: true
       secrets:
         sources:
           - name: microservice-social-network
