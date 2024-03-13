@@ -46,7 +46,7 @@ public class CommentService {
 
 
     public CommentDto createComment(UUID postId, CommentDto commentDto) {
-        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
+        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUserFromAuthentication().getId());
         commentDto.setCommentType(CommentTypeDto.POST);
         commentDto.setParentId(postId);
         commentDto.setPostId(postId);
@@ -59,7 +59,7 @@ public class CommentService {
     }
 
     public LikeDto addLikeToComment(UUID commentId) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
 
         Like existingLike = likeRepository.findByCommentIdAndAuthorId(commentId, authorId);
         if (existingLike != null) {
@@ -81,20 +81,16 @@ public class CommentService {
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
 
-
     public LikeDto deleteLikeToComment(UUID commentId) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         Like like = likeRepository.findByCommentIdAndAuthorIdAndTypeAndIsDeletedFalse(commentId, authorId, CommentType.COMMENT);
         like.setIsDeleted(true);
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
 
-
-    public CommentDto updateComment(CommentDto commentDTO, UUID postId) {
-        CommentDto commentDto = commentMapper.commentToCommentDto(commentRepository.saveAndFlush(commentMapper
-                .updateCommentDtoToEntity(commentDTO, commentRepository.getById(postId))));
-        commentDto.setCommentsCount(commentRepository.commentCount(postId));
-        return commentDTO;
+    public CommentDto updateComment(CommentDto commentDTO) {
+        return commentMapper.commentToCommentDto(commentRepository.saveAndFlush(commentMapper
+                .updateCommentDtoToEntity(commentDTO, commentRepository.getById(commentDTO.getId()))));
     }
 
     @Transactional(readOnly = true)
@@ -103,7 +99,7 @@ public class CommentService {
                 .where(SpecificationUtil.equalValue(Comment_.parentId, commentSearchDTO.getPostId()))
                 .and(SpecificationUtil.equalValue(Comment_.isDeleted, commentSearchDTO.getIsDeleted()));
 
-        return getCommentDtoPage(commentSearchDTO, pageable, specification);
+        return getCommentDtoPage(pageable, specification);
     }
 
 
@@ -113,11 +109,11 @@ public class CommentService {
                 .where(SpecificationUtil.equalValue(Comment_.parentId, commentSearchDTO.getCommentId())
                         .and(SpecificationUtil.equalValue(Comment_.isDeleted, commentSearchDTO.getIsDeleted())));
 
-        return getCommentDtoPage(commentSearchDTO, pageable, specification);
+        return getCommentDtoPage(pageable, specification);
     }
 
 
-    private Page<CommentDto> getCommentDtoPage(CommentSearchDto commentSearchDTO, Pageable pageable, Specification<Comment> specification) {
+    private Page<CommentDto> getCommentDtoPage(Pageable pageable, Specification<Comment> specification) {
         Page<Comment> comments = commentRepository.findAll(specification, pageable);
 
         List<CommentDto> commentDtos = comments.getContent().stream()
@@ -126,7 +122,11 @@ public class CommentService {
 
         commentDtos.forEach(commentDto -> {
             commentDto.setCommentsCount(commentRepository.commentCount(commentDto.getId()));
-            commentDto.setLikeAmount(likeRepository.likeCount(commentDto.getId()));
+            commentDto.setLikeAmount(likeRepository.likeCountForComment(commentDto.getId()));
+            String myReaction = likeRepository.getMyReactionForComment(
+                    CurrentUserExtractor.getCurrentUserFromAuthentication().getId(),
+                    commentDto.getId());
+            commentDto.setMyLike(myReaction != null && myReaction.equals("COMMENT"));
         });
 
         return new PageImpl<>(commentDtos, pageable, comments.getTotalElements());
@@ -134,7 +134,7 @@ public class CommentService {
 
 
     public CommentDto createSubComment(CommentDto commentDto, UUID postId, UUID commentId) {
-        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
+        commentDto.setAuthorId(CurrentUserExtractor.getCurrentUserFromAuthentication().getId());
         commentDto.setCommentType(CommentTypeDto.COMMENT);
         commentDto.setParentId(commentId);
         commentDto.setPostId(postId);
@@ -144,5 +144,11 @@ public class CommentService {
         kafkaProducerService.sendNotification(comment.getAuthorId(), null,
                 "Отправка коммента на коммент", NotificationType.COMMENT_COMMENT);
         return commentMapper.commentToCommentDto(commentRepository.save(comment));
+    }
+
+    public String deleteComment(UUID commentId) {
+        likeRepository.deleteByCommentId(commentId);
+        commentRepository.deleteById(commentId);
+        return "Comment deleted";
     }
 }

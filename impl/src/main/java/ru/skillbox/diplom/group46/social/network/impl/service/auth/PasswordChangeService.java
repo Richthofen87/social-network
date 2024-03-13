@@ -25,7 +25,7 @@ public class PasswordChangeService {
 
     @Transactional
     public ResponseEntity<String> changePassword(PasswordChangeDto passwordChangeDto) {
-        log.debug("Changing password for user: {}", CurrentUserExtractor.getCurrentUser().getEmail());
+        log.debug("Changing password for user: {}", CurrentUserExtractor.getCurrentUserFromAuthentication().getEmail());
 
         String newPassword1 = passwordChangeDto.getNewPassword1();
         String newPassword2 = passwordChangeDto.getNewPassword2();
@@ -34,7 +34,7 @@ public class PasswordChangeService {
             return ResponseEntity.badRequest().body("Введённые пароли не совпадают");
         }
 
-        UUID uuid = CurrentUserExtractor.getCurrentUser().getId();
+        UUID uuid = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         User currentUser = userRepository.findById(uuid).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + uuid + " not found"));
 

@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group46.social.network.impl.config.audit;
 import lombok.RequiredArgsConstructor;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -13,6 +14,7 @@ import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtr
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Configuration
 @EnableJpaAuditing
 @RequiredArgsConstructor
@@ -26,12 +28,16 @@ public class AuditConfig {
     public class EntityAuditorAware implements AuditorAware<UserJsonType> {
         @Override
         public Optional<UserJsonType> getCurrentAuditor() {
-            UUID uuid = CurrentUserExtractor.getCurrentUser().getId();
-            String email = CurrentUserExtractor.getCurrentUser().getEmail();
-            UserJsonType user = new UserJsonType(uuid.toString(), email);
+            UserJsonType user;
+            try {
+                UUID uuid = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
+                String email = CurrentUserExtractor.getCurrentUserFromAuthentication().getEmail();
+                user = new UserJsonType(uuid.toString(), email);
+            } catch (NullPointerException e) {
+                log.info("Current user is null");
+                return Optional.empty();
+            }
             return Optional.of(user);
         }
     }
-
-
 }

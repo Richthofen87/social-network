@@ -13,4 +13,6 @@ public class LikeDto extends BaseDto {
     private UUID itemId;
     private CommentTypeDto type;
     private String reactionType;
+    private UUID postId;
+    private UUID commentId;
 }

@@ -21,7 +21,7 @@ public interface PostController {
     ResponseEntity<PostDto> post(@RequestBody PostDto postDto);
 
     @PutMapping("{id}/comment")
-    ResponseEntity<CommentDto> updateComment(@PathVariable UUID id, @RequestBody CommentDto commentDto);
+    ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto);
 
     @PostMapping("{id}/comment")
     ResponseEntity<CommentDto> createComment(@PathVariable UUID id, @RequestBody CommentDto commentDto);
@@ -33,9 +33,6 @@ public interface PostController {
 
     @DeleteMapping("{id}/comment/{commentId}")
     ResponseEntity<String> deleteComment(@PathVariable UUID commentId);
-
-    @PutMapping("delayed")
-    ResponseEntity<Void> updateDelayedPost(@RequestBody PostDto post);
 
     @PostMapping("{id}/like")
     ResponseEntity<LikeDto> likePost(@PathVariable UUID id, @RequestBody LikeDto likeDto);
@@ -57,8 +54,8 @@ public interface PostController {
     ResponseEntity<Page<CommentDto>> getSubComments(CommentSearchDto commentSearchDto,
                                                    Pageable pageable);
 
-    @GetMapping("{id}")
-    ResponseEntity<PostDto> getPost(@PathVariable String id);
+    @GetMapping("newsPosts")
+    ResponseEntity<Page<PostDto>> getNewsPosts(PostSearchDto postSearchDto, Pageable pageable);
 
     @DeleteMapping("{id}")
     ResponseEntity<String> deletePost(@PathVariable UUID id);
