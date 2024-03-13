@@ -73,7 +73,7 @@ public class AuthService {
         Authentication authentication = jwtAuthenticationProvider.authenticate(
                 new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
 
-        return ResponseEntity.ok(tokenGenerator.createToken(authentication));
+        return ResponseEntity.ok(tokenGenerator.createToken(new User()));
     }
 
     public ResponseEntity<String> recoverPassword(String recoveryTokenId, NewPasswordDto newPasswordDto) {
@@ -139,42 +139,15 @@ public class AuthService {
         return ResponseEntity.ok("Выход из системы успешно выполнен");
     }
 
-    public ResponseEntity<AuthenticateResponseDto> createAuthToken(AuthenticateDto authenticateDto, HttpServletResponse response) {
+    public AuthenticateResponseDto createAuthToken(AuthenticateDto authenticateDto) {
         log.info("Logging in user: {}", authenticateDto.getEmail());
 
         User user = userService.findByEmail(authenticateDto.getEmail());
         if (user == null || !passwordEncoder.matches(authenticateDto.getPassword(), user.getPassword())) {
             throw new AuthenticationError(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль");
         }
-        Role userRole = roleService.getUserRole();
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(userRole.getValue()));
-
-        JwtAuthenticationToken authenticationToken = JwtAuthenticationToken.authenticated(user, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-        AuthenticateResponseDto authenticateResponseDto = tokenGenerator.createToken(authenticationToken);
-
-        String cookieValue = String.format("jwt=%s; HttpOnly; Secure; Path=/; SameSite=None", authenticateResponseDto.getAccessToken());
-        response.setHeader("Set-Cookie", cookieValue);
-
-        // время истечения токена
-        Instant expirationTime;
-        if (authenticationToken.getCredentials() instanceof Jwt jwt) {
-            expirationTime = jwt.getExpiresAt();
-        } else {
-            expirationTime = Instant.now().plusSeconds(3600);
-        }
-
-        if (expirationTime != null) {
-            tokenRevocationService.addToken(
-                    authenticateResponseDto.getAccessToken(),
-                    user.getEmail(),
-                    expirationTime.toEpochMilli()
-            );
-        }
-
-        return ResponseEntity.ok(authenticateResponseDto);
+        AuthenticateResponseDto authenticateResponseDto = tokenGenerator.createToken(user);
+        return authenticateResponseDto;
     }
 
     public ResponseEntity<String> changePassword(PasswordChangeDto passwordChangeDto) {

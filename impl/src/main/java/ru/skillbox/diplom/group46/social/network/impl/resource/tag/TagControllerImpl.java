@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.resources.tag;
+package ru.skillbox.diplom.group46.social.network.impl.resource.tag;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
