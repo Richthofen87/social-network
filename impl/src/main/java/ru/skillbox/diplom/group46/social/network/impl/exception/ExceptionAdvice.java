@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,5 +34,13 @@ public class ExceptionAdvice {
             log.warn("AuthenticationError: status={}, message={}", authError.getStatus(), authError.getMessage());
         }
         return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
+        // return ResponseEntity.status(401).body(e.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ErrorResponse handleBadCredentialsException(BadCredentialsException ex) {
+        log.warn("Method handleBadCredentialsException(%s) started with param: \"%s\", cause: \"%s\""
+                .formatted(BadCredentialsException.class, ex, ex.getCause()));
+        return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, "Неверный или протухший токен");
     }
 }

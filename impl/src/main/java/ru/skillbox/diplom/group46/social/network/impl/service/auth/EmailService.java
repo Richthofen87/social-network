@@ -1,12 +1,13 @@
 package ru.skillbox.diplom.group46.social.network.impl.service.auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -17,6 +18,8 @@ public class EmailService {
     private String senderEmail;
 
     public void sendRecoveryEmail(String email, String recoveryToken) throws MailException {
+        log.info("Sending recovery email to: {}", email);
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
         message.setTo(email);
@@ -26,5 +29,7 @@ public class EmailService {
                 + "If you did not request this, please ignore this email.\n\nThank you.");
 
         emailSender.send(message);
+
+        log.info("Recovery email sent successfully to: {}", email);
     }
 }

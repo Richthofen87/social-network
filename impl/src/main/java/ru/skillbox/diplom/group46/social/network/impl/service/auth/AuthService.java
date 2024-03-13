@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group46.social.network.impl.service.auth;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,13 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.auth.RecoveryTo
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
+import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -47,9 +51,13 @@ public class AuthService {
     private final EmailService emailService;
     private final RecoveryTokenRepository recoveryTokenRepository;
     private final TokenRevocationService tokenRevocationService;
+    private final PasswordChangeService passwordChangeService;
+    private final EmailChangeService emailChangeService;
 
     public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto);
+        log.info("Creating new user: {}", registrationDto.getEmail());
+
         if (!registrationDto.getPassword1().equals(registrationDto.getPassword2())) {
             return ResponseEntity.badRequest().body(
                     new AuthenticationError(HttpStatus.BAD_REQUEST.value(), "Пароли не совпадают"));
@@ -60,6 +68,8 @@ public class AuthService {
     }
 
     public ResponseEntity<AuthenticateResponseDto> refreshToken(AuthenticateResponseDto authenticateResponseDto) {
+        log.info("Refreshing token for user");
+
         Authentication authentication = jwtAuthenticationProvider.authenticate(
                 new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
 
@@ -67,6 +77,7 @@ public class AuthService {
     }
 
     public ResponseEntity<String> recoverPassword(String recoveryTokenId, NewPasswordDto newPasswordDto) {
+        log.info("Recovering password with recoveryTokenId: {}", recoveryTokenId);
 
         RecoveryToken recoveryToken = recoveryTokenRepository.findByToken(recoveryTokenId);
         if (recoveryToken == null) {
@@ -92,6 +103,7 @@ public class AuthService {
     }
 
     public ResponseEntity<String> sendRecoveryEmail(PasswordRecoveryDto passwordRecoveryDto) {
+        log.info("Sending recovery email for user: {}", passwordRecoveryDto.getEmail());
 
         String email = passwordRecoveryDto.getEmail();
 
@@ -107,7 +119,16 @@ public class AuthService {
     }
 
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        SecurityContextHolder.getContext().setAuthentication(null);
+
+        String userEmail = CurrentUserExtractor.getCurrentUser().getEmail();
+        log.info("Logging out user: {}", userEmail);
+
+        ResponseEntity<String> revokeTokensResponse = revokeUserTokens(userEmail);
+
+        if (revokeTokensResponse.getStatusCode() != HttpStatus.OK) {
+            log.error("Ошибка при отзыве токенов пользователя {} при выходе из системы", userEmail);
+        }
+
         SecurityContextHolder.clearContext();
 
         Cookie cookie = new Cookie("jwt", null);
@@ -119,6 +140,7 @@ public class AuthService {
     }
 
     public ResponseEntity<AuthenticateResponseDto> createAuthToken(AuthenticateDto authenticateDto, HttpServletResponse response) {
+        log.info("Logging in user: {}", authenticateDto.getEmail());
 
         User user = userService.findByEmail(authenticateDto.getEmail());
         if (user == null || !passwordEncoder.matches(authenticateDto.getPassword(), user.getPassword())) {
@@ -136,11 +158,40 @@ public class AuthService {
         String cookieValue = String.format("jwt=%s; HttpOnly; Secure; Path=/; SameSite=None", authenticateResponseDto.getAccessToken());
         response.setHeader("Set-Cookie", cookieValue);
 
+        // время истечения токена
+        Instant expirationTime;
+        if (authenticationToken.getCredentials() instanceof Jwt jwt) {
+            expirationTime = jwt.getExpiresAt();
+        } else {
+            expirationTime = Instant.now().plusSeconds(3600);
+        }
+
+        if (expirationTime != null) {
+            tokenRevocationService.addToken(
+                    authenticateResponseDto.getAccessToken(),
+                    user.getEmail(),
+                    expirationTime.toEpochMilli()
+            );
+        }
+
         return ResponseEntity.ok(authenticateResponseDto);
     }
 
+    public ResponseEntity<String> changePassword(PasswordChangeDto passwordChangeDto) {
+        log.info("Changing password for user: ");
+
+        return passwordChangeService.changePassword(passwordChangeDto);
+    }
+
+    public ResponseEntity<String> changeEmailLink(ChangeEmailDto changeEmailDto) {
+        log.info("Changing email for user: {}", changeEmailDto.getEmail());
+
+        return emailChangeService.changeEmail(changeEmailDto);
+    }
 
     public ResponseEntity<String> revokeUserTokens(String email) {
+        log.info("Revoking tokens for user: {}", email);
+
         boolean success = tokenRevocationService.revokeUserTokensByEmail(email);
         if (success) {
             return ResponseEntity.ok("Access и refresh токены пользователя удалены из списка активных");
@@ -151,6 +202,8 @@ public class AuthService {
     }
 
     public ResponseEntity<String> revokeAllTokens() {
+        log.info("Revoking all tokens");
+
         boolean success = tokenRevocationService.revokeAllTokens();
         if (success) {
             return ResponseEntity.ok("Все текущие сессии закрыты");

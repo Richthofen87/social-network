@@ -1,7 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.impl.auth.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -14,12 +14,12 @@ import ru.skillbox.diplom.group46.social.network.api.dto.auth.CustomUserDetails;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.AuthenticateResponseDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.UserDTO;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
-import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenGenerator {
@@ -30,12 +30,14 @@ public class TokenGenerator {
     private final JwtEncoder refreshTokenEncoder;
 
     private String createAccessToken(Authentication authentication) {
+        log.debug("Creating access token");
+
         User user = (User) authentication.getPrincipal();
         Instant now = Instant.now();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
-                .expiresAt(now.plus(10, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
                 .subject(user.getId().toString())
                 .claim("firstName", user.getFirstName())
                 .claim("lastName", user.getLastName())
@@ -45,6 +47,8 @@ public class TokenGenerator {
     }
 
     private String createRefreshToken(Authentication authentication) {
+        log.debug("Creating refresh token");
+
         User user = (User) authentication.getPrincipal();
         Instant now = Instant.now();
 

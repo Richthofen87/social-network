@@ -54,6 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.debug("Configuring security filter chain.");
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -61,12 +62,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/*").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/auth/refresh").authenticated()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/secured").authenticated()
                         .requestMatchers("/info").authenticated()
                         .requestMatchers("/api/v1/auth/admin/revokeUserTokens").authenticated()
                         .requestMatchers("/admin/revokeAllTokens").authenticated()
-                        //.requestMatchers("/api/v1/auth/admin/revokeUserTokens").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/auth/admin/*").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/user").hasRole("USER")
                         .anyRequest().permitAll())
@@ -87,6 +88,7 @@ public class SecurityConfig {
 
     @Bean
     public BearerTokenResolver bearerTokenResolver() {
+        log.debug("Creating BearerTokenResolver bean.");
         return new DefaultBearerTokenResolver();
     }
 
