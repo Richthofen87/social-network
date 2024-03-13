@@ -31,7 +31,7 @@ public class ExceptionAdvice {
                 .formatted(Throwable.class, ex, ex.getCause()));
         if (ex instanceof AuthenticationError) {
             AuthenticationError authError = (AuthenticationError) ex;
-            log.warn("AuthenticationError: status={}, message={}", authError.getStatus(), authError.getMessage());
+            log.warn("AuthenticationError: status={}, MessageDto={}", authError.getStatus(), authError.getMessage());
         }
         return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
         // return ResponseEntity.status(401).body(e.getMessage());

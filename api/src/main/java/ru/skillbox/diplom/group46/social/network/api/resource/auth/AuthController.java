@@ -31,7 +31,7 @@ public interface AuthController {
     ResponseEntity<?> logout(HttpServletResponse response) throws IOException;
 
     @PostMapping("/login")
-    ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
+    ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto);
 
     @PostMapping("/change-password-link")
     ResponseEntity<String> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);

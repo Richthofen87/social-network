@@ -1,13 +1,14 @@
 package ru.skillbox.diplom.group46.social.network.impl.repository.friend;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.group46.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
+@Repository
 public interface FriendRepository extends BaseRepository<Friend, UUID> {
 
 

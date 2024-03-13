@@ -17,7 +17,7 @@ import java.util.UUID;
 public class CurrentUserExtractor {
 
     private final JwtUserExtractor extractor;
-    private static JwtUserExtractor staticExtractor;
+    public static JwtUserExtractor staticExtractor;
 
     @PostConstruct
     private void initExtractor() {
