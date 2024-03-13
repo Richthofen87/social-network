@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.captcha.CaptchaDto;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 public interface AuthController {
@@ -26,15 +28,21 @@ public interface AuthController {
     ResponseEntity<?> sendRecoveryEmail(@RequestBody PasswordRecoveryDto passwordRecoveryDto);
 
     @PostMapping("/logout")
-    ResponseEntity<?> logout(HttpServletResponse response);
+    ResponseEntity<?> logout(HttpServletResponse response) throws IOException;
 
     @PostMapping("/login")
     ResponseEntity<?> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
 
-    @PostMapping("/api/v1/auth/admin/revokeUserTokens/{email}")
+    @PostMapping("/change-password-link")
+    ResponseEntity<String> changePasswordLink(@RequestBody PasswordChangeDto passwordChangeDto);
+
+    @PostMapping("/change-email-link")
+    ResponseEntity<String> changeEmailLink(@RequestBody ChangeEmailDto changeEmailDto);
+
+    @DeleteMapping("/admin/revokeUserTokens/{email}")
     ResponseEntity<String> revokeUserTokens(@PathVariable String email);
 
-    @PostMapping("/admin/revokeAllTokens")
+    @DeleteMapping("/admin/revokeAllTokens")
     ResponseEntity<String> revokeAllTokens();
 
     @GetMapping("/captcha")

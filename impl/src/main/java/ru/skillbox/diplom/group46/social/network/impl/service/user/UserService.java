@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
-import ru.skillbox.diplom.group46.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.account.AccountService;
 
 @Slf4j
 @Service
@@ -27,4 +27,5 @@ public class UserService {
         log.debug("Method findByEmail(%s) started with param: \"%s\"".formatted(String.class, email));
         return userRepository.findByEmail(email).orElse(null);
     }
+
 }
