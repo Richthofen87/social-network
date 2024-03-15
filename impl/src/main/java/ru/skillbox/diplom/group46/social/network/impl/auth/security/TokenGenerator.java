@@ -23,14 +23,10 @@ import java.time.temporal.ChronoUnit;
 public class TokenGenerator {
 
     private final JwtEncoder accessTokenEncoder;
-
-    @Qualifier("jwtRefreshTokenEncoder")
     private final JwtEncoder refreshTokenEncoder;
 
     private String createAccessToken(User user) {
         log.debug("Creating access token");
-
-;
         Instant now = Instant.now();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
@@ -44,30 +40,23 @@ public class TokenGenerator {
         return accessTokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
 
-    private String createRefreshToken(Authentication authentication) {
+    public String createRefreshToken(User user) {
         log.debug("Creating refresh token");
-
-        User user = (User) authentication.getPrincipal();
         Instant now = Instant.now();
-
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.DAYS))
                 .subject(user.getId().toString())
                 .build();
-
         return refreshTokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
 
     public AuthenticateResponseDto createToken(User authentication) {
+        log.debug("Creating tokens");
         AuthenticateResponseDto authenticateResponseDto = new AuthenticateResponseDto();
-       String accessToken = createAccessToken(authentication);
-        authenticateResponseDto.setAccessToken(accessToken);
-
-
-        authenticateResponseDto.setRefreshToken(accessToken);
-
+        authenticateResponseDto.setAccessToken(createAccessToken(authentication));
+        authenticateResponseDto.setRefreshToken(createRefreshToken(authentication));
         return authenticateResponseDto;
     }
 }

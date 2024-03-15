@@ -18,7 +18,7 @@ public class EmailService {
     private String senderEmail;
 
     public void sendRecoveryEmail(String email, String recoveryToken) throws MailException {
-        log.info("Sending recovery email to: {}", email);
+        log.debug("Sending recovery email to: {}", email);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
@@ -30,6 +30,6 @@ public class EmailService {
 
         emailSender.send(message);
 
-        log.info("Recovery email sent successfully to: {}", email);
+        log.debug("Recovery email sent successfully to: {}", email);
     }
 }

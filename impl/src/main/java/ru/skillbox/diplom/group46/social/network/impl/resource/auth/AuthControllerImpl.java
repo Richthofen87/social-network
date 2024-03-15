@@ -28,8 +28,8 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto) {
-        return authService.refreshToken(authenticateResponseDto);
+    public ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody RefreshDto refreshDto) {
+        return authService.refreshToken(refreshDto);
     }
 
     @Override
@@ -53,9 +53,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<AuthenticateResponseDto> login(@RequestBody AuthenticateDto authenticateDto) {
-
         return ResponseEntity.ok(authService.createAuthToken(authenticateDto));
-
     }
 
     @Override
@@ -88,4 +86,8 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
+    @Override
+    public ResponseEntity<String> getActiveUsers() {
+        return ResponseEntity.ok(tokenRevocationService.getActiveUsersAsString());
+    }
 }

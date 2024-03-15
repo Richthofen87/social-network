@@ -31,7 +31,7 @@ public class EmailChangeService {
             return ResponseEntity.badRequest().body("Текущий пользователь не найден");
         }
 
-        log.info("Changing email for user: {}", currentUser.getEmail());
+        log.debug("Changing email for user: {}", currentUser.getEmail());
 
         String newEmail = changeEmailDto.getEmail().getEmail();
 
@@ -44,7 +44,7 @@ public class EmailChangeService {
         currentUser.setEmail(newEmail);
         userRepository.save(currentUser);
 
-        log.info("Email successfully changed for user: {}", newEmail);
+        log.debug("Email successfully changed for user: {}", newEmail);
 
         return ResponseEntity.ok("Адрес электронной почты успешно изменен. Проверьте свою почту для завершения операции.");
     }

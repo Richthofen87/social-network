@@ -27,13 +27,13 @@ public class RecoveryTokenService {
         recoveryToken.setExpiryDate(expiryDate);
         recoveryToken.setUser(user);
         RecoveryToken savedToken = recoveryTokenRepository.save(recoveryToken);
-        log.info("Generated recovery token for user {} with token {}", user.getEmail(), token);
+        log.debug("Generated recovery token for user {} with token {}", user.getEmail(), token);
         return savedToken;
     }
 
     public void deleteByToken(String token) {
         recoveryTokenRepository.deleteByToken(token);
-        log.info("Deleted recovery token with token {}", token);
+        log.debug("Deleted recovery token with token {}", token);
     }
 
 }

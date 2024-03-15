@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.skillbox.diplom.group46.social.network.impl.auth.security.JwtRequestWrapper;
 import ru.skillbox.diplom.group46.social.network.impl.service.auth.TokenRevocationService;
+import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
 import java.io.IOException;
 
@@ -45,7 +46,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                if (tokenRevocationService.isActive(jwt)) {
+                String userEmail = CurrentUserExtractor.getCurrentUser().getEmail();
+                if (tokenRevocationService.isActive(jwt, userEmail)) {
                     log.debug("Token is active. Authenticating...");
 
                     BearerTokenAuthenticationToken bearerTokenAuthenticationToken = new BearerTokenAuthenticationToken(jwt);
@@ -68,6 +70,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
             return;
         }
+
         log.debug("Token not found in header or cookie. Proceeding with filter chain.");
         filterChain.doFilter(request, response);
     }
