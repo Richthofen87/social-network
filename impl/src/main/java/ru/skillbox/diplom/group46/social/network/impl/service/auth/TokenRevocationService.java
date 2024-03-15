@@ -18,7 +18,7 @@ public class TokenRevocationService {
     private final Map<String, Long> tokenExpirations = new ConcurrentHashMap<>();
 
     public boolean revokeUserTokensByEmail(String email) {
-        log.info("Revoking tokens for user with email: {}", email);
+        log.debug("Revoking tokens for user with email: {}", email);
 
         List<String> tokens = activeTokens.get(email);
         if (tokens != null && !tokens.isEmpty()) {
@@ -33,11 +33,11 @@ public class TokenRevocationService {
     }
 
     public boolean revokeAllTokens() {
-        log.info("Revoking all tokens");
+        log.debug("Revoking all tokens");
 
         activeTokens.clear();
         tokenExpirations.clear();
-        log.info("All current sessions have been closed");
+        log.debug("All current sessions have been closed");
 
         return true;
     }
@@ -48,7 +48,7 @@ public class TokenRevocationService {
             if (entry.getValue().contains(token)) {
                 entry.getValue().remove(token);
                 tokenExpirations.remove(token);
-                log.info("Токен {} был успешно отозван.", token);
+                log.debug("Токен {} был успешно отозван.", token);
                 return;
             }
         }
@@ -57,7 +57,7 @@ public class TokenRevocationService {
 
     @Scheduled(fixedDelay = 24 * 60 * 60 * 1000) // каждые 24 часа
     public void cleanInactiveTokens() {
-        log.info("Cleaning up inactive tokens");
+        log.debug("Cleaning up inactive tokens");
         activeTokens.forEach((email, tokens) -> {
             tokens.removeIf(this::isTokenExpired);
             if (tokens.isEmpty()) {
@@ -77,14 +77,12 @@ public class TokenRevocationService {
     public void addToken(String token, String email, long expirationTime) {
         activeTokens.computeIfAbsent(email, k -> new ArrayList<>()).add(token);
         tokenExpirations.put(token, expirationTime);
-        log.info("Token {} has been successfully added for user {}.", token, email);
+        log.debug("Token {} has been successfully added for user {}.", token, email);
     }
 
-    public boolean isActive(String token) {
-        List<String> tokens = activeTokens.values().stream()
-                .flatMap(List::stream)
-                .toList();
-        if (!tokens.contains(token)) {
+    public boolean isActive(String token, String userEmail) {
+        List<String> userTokens = activeTokens.getOrDefault(userEmail, new ArrayList<>());
+        if (!userTokens.contains(token)) {
             return false;
         }
 
@@ -93,6 +91,16 @@ public class TokenRevocationService {
             return false;
         }
         return Instant.ofEpochMilli(expirationTime).isAfter(Instant.now());
+    }
+
+    public String getActiveUsersAsString() {
+        StringBuilder activeUsers = new StringBuilder();
+
+        activeTokens.forEach((email, tokens) -> {
+            activeUsers.append(email).append("\n");
+        });
+
+        return activeUsers.toString();
     }
 
 }

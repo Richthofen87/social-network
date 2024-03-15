@@ -16,7 +16,7 @@ public interface AuthController {
     ResponseEntity<?> register(@RequestBody RegistrationDto registrationDto);
 
     @PostMapping("/refresh")
-    ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody AuthenticateResponseDto authenticateResponseDto);
+    ResponseEntity<AuthenticateResponseDto> refreshToken(@RequestBody RefreshDto refreshDto);
 
     @PostMapping("/password/recovery/{recoveryTokenId}")
     ResponseEntity<String> recoverPassword(
@@ -48,4 +48,6 @@ public interface AuthController {
     @GetMapping("/captcha")
     ResponseEntity<CaptchaDto> getCaptcha();
 
+    @GetMapping("/admin/getActiveUsers")
+    ResponseEntity<String> getActiveUsers();
 }

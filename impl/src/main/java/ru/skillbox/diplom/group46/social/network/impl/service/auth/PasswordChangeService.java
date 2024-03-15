@@ -25,7 +25,7 @@ public class PasswordChangeService {
 
     @Transactional
     public ResponseEntity<String> changePassword(PasswordChangeDto passwordChangeDto) {
-        log.info("Changing password for user: {}", CurrentUserExtractor.getCurrentUser().getEmail());
+        log.debug("Changing password for user: {}", CurrentUserExtractor.getCurrentUser().getEmail());
 
         String newPassword1 = passwordChangeDto.getNewPassword1();
         String newPassword2 = passwordChangeDto.getNewPassword2();

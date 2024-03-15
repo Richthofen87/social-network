@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
@@ -20,18 +17,12 @@ import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.exception.auth.AuthenticationError;
 import ru.skillbox.diplom.group46.social.network.domain.auth.RecoveryToken;
 import ru.skillbox.diplom.group46.social.network.domain.user.User;
-import ru.skillbox.diplom.group46.social.network.domain.user.role.Role;
-import ru.skillbox.diplom.group46.social.network.impl.auth.configs.JwtAuthenticationToken;
 import ru.skillbox.diplom.group46.social.network.impl.auth.security.TokenGenerator;
 import ru.skillbox.diplom.group46.social.network.impl.repository.auth.RecoveryTokenRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Slf4j
 @Service
@@ -53,10 +44,12 @@ public class AuthService {
     private final TokenRevocationService tokenRevocationService;
     private final PasswordChangeService passwordChangeService;
     private final EmailChangeService emailChangeService;
+    private final TokenRefreshService tokenRefreshService;
+
 
     public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto);
-        log.info("Creating new user: {}", registrationDto.getEmail());
+        log.debug("Creating new user: {}", registrationDto.getEmail());
 
         if (!registrationDto.getPassword1().equals(registrationDto.getPassword2())) {
             return ResponseEntity.badRequest().body(
@@ -67,17 +60,17 @@ public class AuthService {
         return ResponseEntity.ok(new UserDTO(user.getId(), user.getFirstName(), user.getPassword(), user.getEmail()));
     }
 
-    public ResponseEntity<AuthenticateResponseDto> refreshToken(AuthenticateResponseDto authenticateResponseDto) {
-        log.info("Refreshing token for user");
-
-        Authentication authentication = jwtAuthenticationProvider.authenticate(
-                new BearerTokenAuthenticationToken(authenticateResponseDto.getRefreshToken()));
-
-        return ResponseEntity.ok(tokenGenerator.createToken(new User()));
+    public ResponseEntity<AuthenticateResponseDto> refreshToken(RefreshDto refreshDto) {
+        AuthenticateResponseDto responseDto = tokenRefreshService.refreshToken(refreshDto.getRefreshToken());
+        if (responseDto != null) {
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     public ResponseEntity<String> recoverPassword(String recoveryTokenId, NewPasswordDto newPasswordDto) {
-        log.info("Recovering password with recoveryTokenId: {}", recoveryTokenId);
+        log.debug("Recovering password with recoveryTokenId: {}", recoveryTokenId);
 
         RecoveryToken recoveryToken = recoveryTokenRepository.findByToken(recoveryTokenId);
         if (recoveryToken == null) {
@@ -103,7 +96,7 @@ public class AuthService {
     }
 
     public ResponseEntity<String> sendRecoveryEmail(PasswordRecoveryDto passwordRecoveryDto) {
-        log.info("Sending recovery email for user: {}", passwordRecoveryDto.getEmail());
+        log.debug("Sending recovery email for user: {}", passwordRecoveryDto.getEmail());
 
         String email = passwordRecoveryDto.getEmail();
 
@@ -121,7 +114,7 @@ public class AuthService {
     public ResponseEntity<?> logout(HttpServletResponse response) {
 
         String userEmail = CurrentUserExtractor.getCurrentUser().getEmail();
-        log.info("Logging out user: {}", userEmail);
+        log.debug("Logging out user: {}", userEmail);
 
         ResponseEntity<String> revokeTokensResponse = revokeUserTokens(userEmail);
 
@@ -140,7 +133,7 @@ public class AuthService {
     }
 
     public AuthenticateResponseDto createAuthToken(AuthenticateDto authenticateDto) {
-        log.info("Logging in user: {}", authenticateDto.getEmail());
+        log.debug("Logging in user: {}", authenticateDto.getEmail());
 
         User user = userService.findByEmail(authenticateDto.getEmail());
         if (user == null || !passwordEncoder.matches(authenticateDto.getPassword(), user.getPassword())) {
@@ -151,19 +144,19 @@ public class AuthService {
     }
 
     public ResponseEntity<String> changePassword(PasswordChangeDto passwordChangeDto) {
-        log.info("Changing password for user: ");
+        log.debug("Changing password for user: ");
 
         return passwordChangeService.changePassword(passwordChangeDto);
     }
 
     public ResponseEntity<String> changeEmailLink(ChangeEmailDto changeEmailDto) {
-        log.info("Changing email for user: {}", changeEmailDto.getEmail());
+        log.debug("Changing email for user: {}", changeEmailDto.getEmail());
 
         return emailChangeService.changeEmail(changeEmailDto);
     }
 
     public ResponseEntity<String> revokeUserTokens(String email) {
-        log.info("Revoking tokens for user: {}", email);
+        log.debug("Revoking tokens for user: {}", email);
 
         boolean success = tokenRevocationService.revokeUserTokensByEmail(email);
         if (success) {
@@ -175,7 +168,7 @@ public class AuthService {
     }
 
     public ResponseEntity<String> revokeAllTokens() {
-        log.info("Revoking all tokens");
+        log.debug("Revoking all tokens");
 
         boolean success = tokenRevocationService.revokeAllTokens();
         if (success) {
