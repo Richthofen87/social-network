@@ -9,11 +9,12 @@ spring:
           - name: microservice-social-network
             namespace: skillbox-group-46
       config:
+        enabled: true
         sources:
-#          - name: library-core
           - name: microservice-social-network
             namespace: skillbox-group-46
       reload:
+        monitoring-config-maps: true
         enabled: true
       client:
         namespace: skillbox-group-46

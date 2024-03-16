@@ -43,7 +43,6 @@ public class GeoService {
         cityStream.write(cities); // запись массиива полученных байтов в выходной поток
         cityStream.close(); // закрываем выходной потое
 
-
         FileReader fileReader = new FileReader("city.json"); // чтение
         Gson gson = new Gson();
         JsonCountryDto[] jsonCountryDto = gson.fromJson(fileReader, JsonCountryDto[].class); // десериализация
@@ -85,8 +84,7 @@ public class GeoService {
     }
 
     public List<CountryDto> getCountry() {
-        log.info("GeoService.getCountry - start method");
-        load();
+         log.info("GeoService.getCountry - start method");
         return countryMapper.countryToDtoList(countryRepository.findAll());
     }
     @Transactional(readOnly = true)

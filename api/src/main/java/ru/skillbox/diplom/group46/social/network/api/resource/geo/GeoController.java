@@ -1,7 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.api.resource.geo;
 
 
-import org.springframework.cloud.openfeign.FeignClient;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.geo.CityDto;

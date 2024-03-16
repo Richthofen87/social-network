@@ -20,9 +20,9 @@ jar-build:
     - echo "Building application..."
     - mvn clean package $MAVEN_OPTS_CLI -DskipTests
     - echo "Application built successfully."
-#  only:
-#    - develop
-#    - merge_requests
+  only:
+    - develop
+    - merge_requests
   artifacts:
     paths:
       - impl/target/network-impl-1.0.0-SNAPSHOT-spring-boot.jar
@@ -45,5 +45,5 @@ docker-deploy:
     - echo "Pushing docker image..."
     - docker push skillboxgroup46/social-network:v1.0.0
     - echo "Application pushed successfully"
-#  only:
-#    - develop
+  only:
+    - develop
