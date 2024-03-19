@@ -57,9 +57,9 @@ refresh-token:
   private: ${REFRESH_TOKEN_PRIVATE_KEY_PATH}
   public: ${REFRESH_TOKEN_PUBLIC_KEY_PATH}
 
-cloudinary:
-  cloud-name: ${CLOUD_NAME}
-  api-key: ${API_KEY}
-  api-secret:  ${API_SECRET}
+cloud:
+  cloudName: ${CLOUD_NAME}
+  apiKey: ${API_KEY}
+  apiSecret:  ${API_SECRET}
 
 

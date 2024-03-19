@@ -59,10 +59,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/*").permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/secured").authenticated()
                         .requestMatchers("/info").authenticated()
                         .requestMatchers("/api/v1/auth/admin/revokeUserTokens").authenticated()
@@ -78,11 +77,9 @@ public class SecurityConfig {
                         oauth2.jwt((jwt) -> jwt.jwtAuthenticationConverter(jwtToUserConverter)))
 
                 .sessionManagement((session) ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                .addFilterBefore(jwtRequestFilter, BearerTokenAuthenticationFilter.class)
-
-        ;
+        http.addFilterBefore(jwtRequestFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 

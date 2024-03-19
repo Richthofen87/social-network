@@ -4,14 +4,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group46.social.network.api.exception.auth.AuthenticationError;
@@ -20,7 +17,6 @@ import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.impl.auth.security.TokenGenerator;
 import ru.skillbox.diplom.group46.social.network.impl.repository.auth.RecoveryTokenRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
-import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
@@ -30,13 +26,9 @@ import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtr
 public class AuthService {
 
     private final UserService userService;
-    private final RoleService roleService;
     private final TokenGenerator tokenGenerator;
     private final PasswordEncoder passwordEncoder;
     private final CaptchaService captchaService;
-
-    @Qualifier("jwtRefreshTokenAuthProvider")
-    private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final UserRepository userRepository;
     private final RecoveryTokenService recoveryTokenService;
     private final EmailService emailService;
@@ -45,7 +37,6 @@ public class AuthService {
     private final PasswordChangeService passwordChangeService;
     private final EmailChangeService emailChangeService;
     private final TokenRefreshService tokenRefreshService;
-
 
     public ResponseEntity<?> createNewUser(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto);
@@ -61,7 +52,7 @@ public class AuthService {
     }
 
     public ResponseEntity<AuthenticateResponseDto> refreshToken(RefreshDto refreshDto) {
-        AuthenticateResponseDto responseDto = tokenRefreshService.refreshToken(refreshDto.getRefreshToken());
+        AuthenticateResponseDto responseDto = tokenRefreshService.refreshToken(refreshDto);
         if (responseDto != null) {
             return ResponseEntity.ok(responseDto);
         } else {
