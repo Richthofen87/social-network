@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
@@ -26,15 +27,15 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler({CaptchaException.class, AuthenticationCredentialsNotFoundException.class, AuthenticationError.class})
-    public ErrorResponse handleAuthException(Throwable ex) {
+    public ResponseEntity handleAuthException(Throwable ex) {
         log.warn("Method handleAuthException(%s) started with param: \"%s\", cause: \"%s\""
                 .formatted(Throwable.class, ex, ex.getCause()));
         if (ex instanceof AuthenticationError) {
             AuthenticationError authError = (AuthenticationError) ex;
             log.warn("AuthenticationError: status={}, MessageDto={}", authError.getStatus(), authError.getMessage());
         }
-        return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
-        // return ResponseEntity.status(401).body(e.getMessage());
+        // return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return ResponseEntity.status(401).body(ex.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)

@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group46.social.network.impl.utils.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class JwtUserExtractor {
 
     private final SecurityConfig securityConfig;
 
+    @Deprecated
     public UserDTO getUserFromToken(String token) {
         JwtDecoder jwtDecoder = securityConfig.jwtAccessTokenDecoder();
         Jwt jwt = jwtDecoder.decode(token);
@@ -27,4 +29,16 @@ public class JwtUserExtractor {
 
         return new UserDTO(id, username, null, email);
     }
+
+    public UserDTO getUserFromAuthentication(Authentication authentication) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        UUID id = UUID.fromString(jwt.getClaim("sub"));
+        String username = jwt.getClaim("firstName");
+        String email = jwt.getClaim("email");
+
+        return new UserDTO(id, username, null, email);
+    }
+
+
 }
