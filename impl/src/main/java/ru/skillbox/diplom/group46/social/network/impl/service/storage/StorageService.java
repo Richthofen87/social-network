@@ -12,9 +12,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class StorageService {
-
     private final Cloudinary cloudinary;
-
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         return cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
