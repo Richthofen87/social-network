@@ -27,6 +27,7 @@ import ru.skillbox.diplom.group46.social.network.impl.service.geo.GeoClient;
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 @EnableFeignClients(basePackageClasses = GeoClient.class)
 public class Application {
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

@@ -1,7 +1,7 @@
 package ru.skillbox.diplom.group46.social.network.domain.notifications;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,18 +17,10 @@ import java.util.UUID;
 
 @Data
 @Entity
+@JsonAutoDetect
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Notification extends BaseEntity {
-
-    public Notification(UUID authorId, String content, NotificationType notificationType) {
-        this.authorId = authorId;
-        this.content = content;
-        this.notificationType = notificationType;
-        sentTime = ZonedDateTime.now();
-        status = NotificationStatus.SEND;
-    }
 
     @Column(name = "author_id")
     private UUID authorId;

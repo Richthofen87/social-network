@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 @NoRepositoryBean
@@ -27,12 +28,17 @@ public class BaseRepositoryImpl<T extends BaseEntity> extends SimpleJpaRepositor
         super.deleteAllInBatch();
     }
 
-
     @Override
     @Transactional
     public void delete(T entity) {
         entity.setIsDeleted(true);
         super.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll(List<T> entities) {
+        entities.forEach(e -> e.setIsDeleted(true));
     }
 
     @Override

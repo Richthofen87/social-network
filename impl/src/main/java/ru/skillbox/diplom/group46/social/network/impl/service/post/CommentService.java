@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group46.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.CommentSearchDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.LikeDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeDto;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment_;
 import ru.skillbox.diplom.group46.social.network.domain.post.Like;
@@ -21,6 +22,7 @@ import ru.skillbox.diplom.group46.social.network.impl.mapper.post.LikeMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.CommentRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.LikeRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.PostRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final KafkaProducerService kafkaProducerService;
     private final CommentMapper commentMapper;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -50,6 +53,8 @@ public class CommentService {
 
         Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
         comment.setPost(postRepository.getById(postId));
+        kafkaProducerService.sendNotification(comment.getAuthorId(), null,
+                "Отправка коммента на пост", NotificationType.POST_COMMENT);
         return commentMapper.commentToCommentDto(commentRepository.save(comment));
     }
 
@@ -69,6 +74,9 @@ public class CommentService {
         like.setTime(ZonedDateTime.now());
         like.setType(CommentType.COMMENT);
         like.setComment(commentRepository.getById(commentId));
+
+        kafkaProducerService.sendNotification(like.getAuthorId(), null,
+                "Установка лайка на коммент", NotificationType.LIKE);
 
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
@@ -133,6 +141,8 @@ public class CommentService {
 
         Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
         comment.setPost(postRepository.getById(postId));
+        kafkaProducerService.sendNotification(comment.getAuthorId(), null,
+                "Отправка коммента на коммент", NotificationType.COMMENT_COMMENT);
         return commentMapper.commentToCommentDto(commentRepository.save(comment));
     }
 }

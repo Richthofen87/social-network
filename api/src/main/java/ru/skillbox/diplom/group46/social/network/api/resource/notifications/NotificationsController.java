@@ -43,5 +43,5 @@ public interface NotificationsController {
     ResponseEntity<Page<ContentDto>> getPage(Pageable pageable);
 
     @GetMapping("/count")
-    ResponseEntity<CountDto> getCount();
+    ResponseEntity<PartCountDto> getCount();
 }

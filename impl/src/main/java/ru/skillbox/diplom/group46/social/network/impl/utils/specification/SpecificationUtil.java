@@ -14,6 +14,9 @@ public class SpecificationUtil<T> {
     public static Specification equalValue(SingularAttribute singularAttribute, Object object) {
         return (root, query, builder) -> object == null ? null : builder.equal(root.get(singularAttribute), object);
     }
+    public static Specification notEqualValue(SingularAttribute singularAttribute, Object object) {
+        return (root, query, builder) -> object == null ? null : builder.notEqual(root.get(singularAttribute), object);
+    }
 
     public static Specification equalValueUUID(SingularAttribute attribute, UUID value) {
         return (root, query, builder) -> value == null ? null : builder.equal(root.get(attribute), value);

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CurrentUserExtractor {
 
 
-    private static JwtUserExtractor extractor;
+    private final JwtUserExtractor extractor;
     public static JwtUserExtractor staticExtractor;
 
     @PostConstruct
@@ -31,12 +31,13 @@ public class CurrentUserExtractor {
         log.debug("Method getCurrentUser() started");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return staticExtractor.getUserFromToken(((Jwt) authentication.getPrincipal()).getTokenValue());
+
     }
 
     public static UserDTO getCurrentUserFromAuthentication() {
         log.debug("Method getCurrentUser() started");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return extractor.getUserFromAuthentication(authentication);
+        return staticExtractor.getUserFromAuthentication(authentication);
     }
 
     public static UserDTO getUserFromJwt(Jwt jwt) {

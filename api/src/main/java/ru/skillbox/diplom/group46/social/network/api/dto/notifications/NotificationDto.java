@@ -1,25 +1,30 @@
 package ru.skillbox.diplom.group46.social.network.api.dto.notifications;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import ru.skillbox.diplom.group46.social.network.api.dto.base.BaseDto;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationStatus;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
- * NotificationDTO
+ * NotificationDto
  *
  * @author vladimir.sazonov
  */
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class NotificationDTO extends BaseDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class NotificationDto extends BaseDto {
+
     private UUID authorId;
     private UUID receiverId;
     private String content;
     private NotificationType notificationType;
-    private ZonedDateTime sentTime;
+    private Long sentTime;
+    private NotificationStatus status;
 }

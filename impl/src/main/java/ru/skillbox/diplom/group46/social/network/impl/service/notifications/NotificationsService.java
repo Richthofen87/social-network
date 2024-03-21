@@ -8,22 +8,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.group46.social.network.api.dto.notifications.ContentDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.notifications.CountDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.notifications.SettingUpdateDTO;
-import ru.skillbox.diplom.group46.social.network.domain.account.Account;
+import ru.skillbox.diplom.group46.social.network.api.dto.notifications.*;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.Notification;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationStatus;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.Notification_;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.Settings;
+import ru.skillbox.diplom.group46.social.network.impl.mapper.notifications.NotificationMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.NotificationRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.SettingsRepository;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,13 +39,14 @@ public class NotificationsService {
 
     private final WebSocketService webSocketService;
     private final SettingsRepository settingsRepository;
+    private final NotificationMapper notificationMapper;
     private final NotificationRepository notificationRepository;
 
     public Page<ContentDto> getAllNotifications() {
         log.debug("Method getNotifications() started");
         Specification<Notification> spec = SpecificationUtil.equalValue(Notification_.receiverId, getCurrentUserId());
         return notificationRepository.findAll(spec, PageRequest.of(0, 20, Sort.unsorted()))
-                .map((note) -> new ContentDto(note.getSentTime(), note));
+                .map((note) -> new ContentDto(note.getSentTime().toEpochSecond(), notificationMapper.entityToDto(note)));
     }
 
     public Notification addNotificationToDb(Notification notification) {
@@ -99,46 +99,47 @@ public class NotificationsService {
                 .formatted(Pageable.class, pageable));
         Specification<Notification> spec = SpecificationUtil
                 .equalValue(Notification_.receiverId, getCurrentUserId())
-                .and(SpecificationUtil.equalValue(Notification_.status, NotificationStatus.SEND));
+                .and(SpecificationUtil.equalValue(Notification_.status, NotificationStatus.SEND))
+                .and(SpecificationUtil.equalValue(Notification_.isDeleted, false));
         return notificationRepository.findAll(spec, pageable)
-                .map((note) -> new ContentDto(note.getSentTime(), note));
+                .map((note) -> new ContentDto(note.getSentTime().toEpochSecond(), notificationMapper.entityToDto(note)));
     }
 
-    public CountDto getSendNotificationCount() {
+    public PartCountDto getSendNotificationCount() {
         log.debug("Method getSendNotificationCount() started");
-        int count = notificationRepository.countAllByStatus(NotificationStatus.SEND);
-        return new CountDto(ZonedDateTime.now(), count);
+        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        int count = notificationRepository
+                .countAllByReceiverIdAndStatusAndIsDeleted(authorId, NotificationStatus.SEND, false);
+        PartCountDto partCountDto = new PartCountDto();
+        partCountDto.setCount(count);
+        return partCountDto;
     }
 
-    public void sendNotificationsToFriends(Notification note) {
+    @KafkaListener(topics = "notifications", groupId = "notesGroup")
+    protected void consume(NotificationDto dto) {
+        log.info("Method consume(%s) started with param: \"%s\""
+                .formatted(NotificationDto.class, dto));
+        sendNotificationsToFriends(dto);
+    }
+
+    public void sendNotificationsToFriends(NotificationDto note) {
         log.debug("Method getNotificationsToSend(%s) started with param: \"%s\""
                 .formatted(Notification.class, note));
-        getFriends(note.getAuthorId())
-                .stream()
-                .map(Account::getId)
-                .filter(id -> {
-                            Settings settings = settingsRepository.findByAccountId(id);
-                            return settings.getProperties().get(note.getNotificationType().name());
-                        })
-                .forEach(id -> {
-                    Notification notification = new Notification();
-                    notification.setAuthorId(note.getAuthorId());
-                    notification.setReceiverId(id);
-                    notification.setContent(note.getContent());
-                    notification.setNotificationType(note.getNotificationType());
-                    notification.setStatus(NotificationStatus.SEND);
-                    notification.setSentTime(note.getSentTime());
-                    addNotificationToDb(notification);
-                    webSocketService.sendNotification(notification);
+        NotificationsProvider.getNotifications(note)
+                .forEach(n -> {
+                    notificationRepository.save(n);
+                    webSocketService.sendNotification(notificationMapper.entityToDto(n));
                 });
+    }
+
+    public void softDeleteFriendRequests(UUID authorId, UUID friendId) {
+        List<Notification> notes = notificationRepository
+                .findAllByAuthorIdAndReceiverIdAndNotificationType(authorId, friendId, NotificationType.FRIEND_REQUEST);
+        notificationRepository.deleteAll(notes);
     }
 
     private UUID getCurrentUserId() {
         log.debug("Method getCurrentUserId() started");
         return CurrentUserExtractor.getCurrentUser().getId();
-    }
-
-    private List<Account> getFriends(UUID id) {
-        return Collections.emptyList();
     }
 }
