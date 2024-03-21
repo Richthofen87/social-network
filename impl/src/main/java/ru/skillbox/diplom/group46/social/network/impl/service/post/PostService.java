@@ -13,6 +13,7 @@ import ru.skillbox.diplom.group46.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.PostSearchDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.TypeDto;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.domain.post.Like;
 import ru.skillbox.diplom.group46.social.network.domain.post.Post;
@@ -25,6 +26,7 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.post.CommentRep
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.LikeRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.TagRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class PostService {
+
+    private final KafkaProducerService kafkaProducerService;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
@@ -62,6 +66,8 @@ public class PostService {
                 })
                 .collect(Collectors.toSet());
         post.setTags(tags);
+        kafkaProducerService.sendNotification(post.getAuthorId(), null,
+                "Создание поста", NotificationType.POST);
         return postMapper.postEntityToPostDto(postRepository.saveAndFlush(post));
     }
 
@@ -123,6 +129,8 @@ public class PostService {
         Like like = likeMapper.likeDtoToLike(likeDto);
         like.setPost(postRepository.getById(postId));
         like.setReactionType(likeDto.getReactionType());
+        kafkaProducerService.sendNotification(like.getAuthorId(), null,
+                "Установка лайка на пост", NotificationType.LIKE);
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
 

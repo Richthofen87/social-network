@@ -15,5 +15,5 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class CountDto {
     private ZonedDateTime timestamp;
-    private int count;
+    private PartCountDto data;
 }

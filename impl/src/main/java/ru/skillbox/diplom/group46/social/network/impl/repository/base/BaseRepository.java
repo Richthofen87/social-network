@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import ru.skillbox.diplom.group46.social.network.domain.base.BaseEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 @NoRepositoryBean
@@ -12,6 +13,8 @@ public interface BaseRepository<T extends BaseEntity, UUID> extends JpaRepositor
     void delete(T entity);
 
     void deleteAll();
+
+    void deleteAll(List<T> entities);
 
     T getById(UUID uuid);
 

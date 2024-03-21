@@ -19,7 +19,7 @@ public interface FriendRepository extends BaseRepository<Friend, UUID> {
     @Query(value = "SELECT f.friendId FROM Friend f WHERE f.authorId = ?1 AND f.isDeleted = false AND f.statusCode = 'FRIEND'")
     List<UUID> getFriendId(UUID id);
 
-    @Query(value = "SELECT count(*) FROM Friend f WHERE f.statusCode = 'REQUEST_TO' AND f.authorId = ?1")
+    @Query(value = "SELECT count(*) FROM Friend f WHERE f.statusCode = 'REQUEST_FROM' AND f.authorId = ?1")
     Integer getFriendCount(UUID id);
 
     @Query(value = "SELECT f.friendId FROM Friend f WHERE f.authorId = ?1 AND f.statusCode = ?2 AND f.isDeleted = false")

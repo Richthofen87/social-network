@@ -13,9 +13,12 @@ import ru.skillbox.diplom.group46.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group46.social.network.domain.account.status_code.StatusCode;
 import ru.skillbox.diplom.group46.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group46.social.network.domain.friend.Friend_;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.friend.FriendRepository;
 
+import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
+import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
@@ -26,71 +29,81 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class FriendService {
+
+    private final NotificationsService notificationsService;
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
-
+    private final KafkaProducerService kafkaProducerService;
 
     //Одобрение запроса на дружбу по id
     public FriendDto addFriend(UUID friendId) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+
         log.info("FriendService.addFriend() StartMethod");
-        return updateFriend(authorId, friendId, StatusCode.FRIEND.toString(), StatusCode.FRIEND.toString());
+        kafkaProducerService.sendNotification(getAuthorId(), null, "Добавление в друзья",
+                NotificationType.FRIEND_APPROVE);
+        return updateFriend(getAuthorId(), friendId, StatusCode.FRIEND.toString(), StatusCode.FRIEND.toString());
     }
 
     //Сня блокировки по id
     public FriendDto unblockFriend(UUID friendId) {
         log.info("FriendService.addFriend() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        Friend author = checkDeleted(authorId, friendId);
-        Friend friend = checkDeleted(friendId, authorId);
-        return updateFriend(authorId, friendId, author.getPreviousStatusCode(), friend.getPreviousStatusCode());
+
+        Friend author = checkDeleted(getAuthorId(), friendId);
+        Friend friend = checkDeleted(friendId, getAuthorId());
+        kafkaProducerService.sendNotification(getAuthorId(), friendId, "Разблокировка друга",
+                NotificationType.FRIEND_UNBLOCKED);
+        return updateFriend(getAuthorId(), friendId, author.getPreviousStatusCode(), friend.getPreviousStatusCode());
     }
 
     //Установка блокировки по id
     public FriendDto blockFriend(UUID friendId) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+
         log.info("FriendService.blockFriend() StartMethod");
-        return updateFriend(authorId, friendId, StatusCode.BLOCKED.toString(), StatusCode.BLOCKED.toString());
+        kafkaProducerService.sendNotification(getAuthorId(), friendId, "Блокировка друга",
+                NotificationType.FRIEND_BLOCKED);
+        return updateFriend(getAuthorId(), friendId, StatusCode.BLOCKED.toString(), StatusCode.BLOCKED.toString());
     }
 
     //Отправка запроса на дружбу по id
     public FriendDto addFriendRequest(UUID friendId) {
         log.info("FriendService.addFriendRequest() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        Friend author = checkDeleted(authorId, friendId);
-        Friend friend = checkDeleted(friendId, authorId);
-        friend = setStatusCode(StatusCode.REQUEST_FROM.toString(), friend, friendId, authorId);
-        author = setStatusCode(StatusCode.REQUEST_TO.toString(), author, authorId, friendId);
+        Friend author = checkDeleted(getAuthorId(), friendId);
+        Friend friend = checkDeleted(friendId, getAuthorId());
+        friend = setStatusCode(StatusCode.REQUEST_FROM.toString(), friend, friendId, getAuthorId());
+        author = setStatusCode(StatusCode.REQUEST_TO.toString(), author, getAuthorId(), friendId);
         FriendDto friendDto = friendMapper.friendToFriendDto
                 (friendRepository.saveAndFlush(author));
         friendRepository.saveAndFlush(friend);
-        return setRating(friendDto, friendId, authorId);
+        kafkaProducerService.sendNotification(getAuthorId(), friendId, "Заявка в друзья от ",
+                NotificationType.FRIEND_REQUEST);
+        return setRating(friendDto, friendId, getAuthorId());
     }
 
     //Создать подписку на пользователя
     public FriendDto subscribeToFriend(UUID friendId) {
         log.info("FriendService.subscribeToFriend() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        Friend author = checkDeleted(authorId, friendId);
-        Friend friend = checkDeleted(friendId, authorId);
-        friend = setStatusCode(StatusCode.SUBSCRIBED.toString(), friend, friendId, authorId);
+
+        Friend author = checkDeleted(getAuthorId(), friendId);
+        Friend friend = checkDeleted(friendId, getAuthorId());
+        friend = setStatusCode(StatusCode.SUBSCRIBED.toString(), friend, friendId, getAuthorId());
         friendRepository.saveAndFlush(friend);
         FriendDto friendDto = friendMapper.friendToFriendDto
                 (friendRepository.saveAndFlush(
-                        setStatusCode(StatusCode.SUBSCRIBED.toString(), author, authorId, friendId)));
-        return setRating(friendDto, friendId, authorId);
+                        setStatusCode(StatusCode.SUBSCRIBED.toString(), author, getAuthorId(), friendId)));
+        kafkaProducerService.sendNotification(getAuthorId(), friendId, "Подписка на друга",
+                NotificationType.FRIEND_SUBSCRIBE);
+        return setRating(friendDto, friendId, getAuthorId());
     }
 
     //Поиск связей пользователя с учетом различных критериев отбора
     @Transactional(readOnly = true)
     public Page<FriendDto> getFriends(FriendSearchDto friendSearchDto, Pageable pageable) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
         Specification<Friend> specification = SpecificationUtil
-                .equalValueUUID(Friend_.authorId, UUID.fromString(authorId.toString()))
+                .equalValueUUID(Friend_.authorId, UUID.fromString(getAuthorId().toString()))
                 .and(SpecificationUtil.ContainsValue(Friend_.statusCode, friendSearchDto.getStatusCode()));
         Page<FriendDto> friendList = friendRepository.findAll(specification, pageable).map(friendMapper::friendToFriendDto);
         friendList.forEach(friendDto -> {
-            setRating(friendDto, authorId, friendDto.getFriendId());
+            setRating(friendDto, getAuthorId(), friendDto.getFriendId());
         });
         return friendList;
     }
@@ -99,78 +112,79 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendDto getFriendId(UUID id) {
         log.info("FriendService.getFriendId() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        return friendMapper.friendToFriendDto(friendRepository.getFriend(authorId, id));
+        return friendMapper.friendToFriendDto(friendRepository.getFriend(getAuthorId(), id));
     }
 
     //Удаление связи между пользователями
     public void deleteFriend(UUID friendId) {
         log.info("FriendService.deleteFriend() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        Friend author = (friendRepository.getFriend(authorId, friendId));
-        Friend friend = (friendRepository.getFriend(friendId, authorId));
+        Friend author = (friendRepository.getFriend(getAuthorId(), friendId));
+        Friend friend = (friendRepository.getFriend(friendId, getAuthorId()));
         author.setIsDeleted(true);
         friend.setIsDeleted(true);
-        friend = setStatusCode(StatusCode.NONE.toString(), friend, friendId, authorId);
-        author = setStatusCode(StatusCode.NONE.toString(), author, authorId, friendId);
+        friend = setStatusCode(StatusCode.NONE.toString(), friend, friendId, getAuthorId());
+        author = setStatusCode(StatusCode.NONE.toString(), author, getAuthorId(), friendId);
         friendRepository.saveAndFlush(author);
         friendRepository.saveAndFlush(friend);
+        notificationsService.softDeleteFriendRequests(getAuthorId(), friendId);
     }
 
     //Получение пользователей по статусу отношений
     @Transactional(readOnly = true)
     public Set<String> getFriendsByStatus(String status) {
         log.info("FriendService.getFriendsByStatus() StartMethod");
-        return friendRepository.getFriendsByStatusCode(CurrentUserExtractor.getCurrentUser().getId(), status);
+        return friendRepository.getFriendsByStatusCode(getAuthorId(), status);
     }
 
     // Получение рекомендаций дружбы для текущего пользователя
     @Transactional(readOnly = true)
     public Set<FriendDto> getRecommendations() {
         log.info("FriendService.getRecommendations() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
-        Set<UUID> friendAuthor = friendRepository.getFriendAuthor(authorId, StatusCode.FRIEND.toString());
-        Set<UUID> blokedAuthor = friendRepository.getFriendAuthor(authorId, StatusCode.BLOCKED.toString());
+        Set<UUID> friendAuthor = friendRepository.getFriendAuthor(getAuthorId(), StatusCode.FRIEND.toString());
+        Set<UUID> blokedAuthor = friendRepository.getFriendAuthor(getAuthorId(), StatusCode.BLOCKED.toString());
         Set<UUID> friends = friendRepository.getFriendsAuthors(friendAuthor);
         Set<FriendDto> friendRecommend = friendMapper.SetFriendToFriendDto
                 (friendRepository.getRecommendations(friends));
         for (UUID id : friendAuthor) {
             friendRecommend.removeIf(friendDto -> friendDto.getFriendId().equals(id)
-                    || friendDto.getFriendId().equals(authorId)
+                    || friendDto.getFriendId().equals(getAuthorId())
                     || friendDto.getFriendId().equals(
                     blokedAuthor.iterator().hasNext() ? blokedAuthor.iterator().next() : null));
         }
-        friendRecommend.forEach(friendDto -> setRating(friendDto, authorId, friendDto.getFriendId()));
+        friendRecommend.forEach(friendDto -> setRating(friendDto, getAuthorId(), friendDto.getFriendId()));
         friendRecommend.stream().sorted(Comparator.comparingInt(FriendDto::getRating));
         return friendRecommend;
     }
+
     @Transactional(readOnly = true)
     //Получение списока id всех друзей текущего пользователя
     public Set<UUID> getFriendIds() {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
         log.info("FriendService.getFriendIds() StartMethod");
-        return friendRepository.getFriendAuthor(authorId, StatusCode.FRIEND.toString());
+        return friendRepository.getFriendAuthor(getAuthorId(), StatusCode.FRIEND.toString());
     }
+
     @Transactional(readOnly = true)
     //Получение списока id всех друзей пользователя по его id
     public Set<UUID> getFriendsIds(UUID id) {
         log.info("FriendService.getFriendsIds() StartMethod");
         return friendRepository.getFriendsAuthor(id);
     }
+
     @Transactional(readOnly = true)
     //Получение количества запросов в друзья для текущего пользователя
     public FriendCountDto getFriendCount() {
         log.info("FriendService.getFriendCount() StartMethod");
-        Integer count = friendRepository.getFriendCount(CurrentUserExtractor.getCurrentUser().getId());
+        Integer count = friendRepository.getFriendCount(getAuthorId());
         FriendCountDto countDto = new FriendCountDto();
         countDto.setCount(count);
         return countDto;
     }
+
     @Transactional(readOnly = true)
     //Получение заблокированных связей текущего пользователя
     public Set<UUID> getBlockFriendId() {
         log.info("FriendService.getBlockFriendId() StartMethod");
-        return friendRepository.getBlockFriendId(CurrentUserExtractor.getCurrentUser().getId());
+        return friendRepository.getBlockFriendId(getAuthorId());
     }
 
     private FriendDto updateFriend(UUID authorId, UUID friendId, String statusCodeAuthor, String statusCodeFriend) {
@@ -180,6 +194,7 @@ public class FriendService {
         FriendDto friendDto = friendMapper.friendToFriendDto(friendRepository.saveAndFlush(setStatusCode(statusCodeFriend, author, authorId, friendId)));
         return setRating(friendDto, friendId, authorId);
     }
+
     private Friend setStatusCode(String statusCode, Friend friend, UUID authorId, UUID idFriend) {
         String previousStatusCode = friend.getStatusCode();
         friend.setPreviousStatusCode(previousStatusCode);
@@ -188,6 +203,7 @@ public class FriendService {
         friend.setAuthorId(authorId);
         return friend;
     }
+
     private Friend createFriend(UUID authorId, UUID friendId) {
         Friend friend = friendRepository.getFriend(authorId, friendId);
         if (friend == null) {
@@ -195,6 +211,7 @@ public class FriendService {
         }
         return friend;
     }
+
     private FriendDto setRating(FriendDto friendDto, UUID authorId, UUID idFriend) {
         Integer rating = 0;
         List<UUID> friendAuthor = friendRepository.getFriendId(authorId);
@@ -213,5 +230,10 @@ public class FriendService {
         }
         return friend;
     }
+    private UUID getAuthorId() {
+        return CurrentUserExtractor.getCurrentUser().getId();
+    }
+
+
 }
 

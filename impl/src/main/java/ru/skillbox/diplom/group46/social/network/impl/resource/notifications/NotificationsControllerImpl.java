@@ -78,7 +78,7 @@ public class NotificationsControllerImpl implements NotificationsController {
     }
 
     @Override
-    public ResponseEntity<CountDto> getCount() {
+    public ResponseEntity<PartCountDto> getCount() {
         log.debug("Method getCount() started");
         return ResponseEntity.ok(service.getSendNotificationCount());
     }

@@ -10,6 +10,5 @@ import lombok.Data;
 
 @Data
 public class PartCountDto {
-    private String description;
     private int count;
 }

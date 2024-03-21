@@ -6,7 +6,25 @@ spring:
     admin:
       client:
         enabled: false
-
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    producer:
+      bootstrap-servers: "localhost:9092"
+      client-id: "noteProducer"
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: "notesGroup"
+      bootstrap-servers: "localhost:9092"
+      client-id: "notificationService"
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications
   mail:
     host: smtp.gmail.com
     port: 587
@@ -30,7 +48,7 @@ spring:
     driverClassName: org.postgresql.Driver
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
     properties:

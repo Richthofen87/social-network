@@ -104,6 +104,7 @@ public class AccountService {
                 .formatted(AccountSearchDto.class, Pageable.class, searchDto, pageable));
         String author;
         String[] authorNames;
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         Specification<Account> spec = SpecificationUtil
                 .equalValueUUID(Account_.id, searchDto.getId())
                 .and(SpecificationUtil.equalValue(Account_.isDeleted, searchDto.getIsDeleted()))
@@ -116,7 +117,9 @@ public class AccountService {
                 .and(SpecificationUtil.equalValue(Account_.statusCode, searchDto.getStatusCode()))
                 .and(SpecificationUtil.isBetween(Account_.birthDate, searchDto.getAgeFrom(), searchDto.getAgeTo()))
                 .and(SpecificationUtil.isLessValue(Account_.birthDate, searchDto.getAgeTo()))
-                .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()));
+                .and(SpecificationUtil.isGreatValue(Account_.birthDate, searchDto.getAgeFrom()))
+                .and(SpecificationUtil.equalValueUUIDList(Account_.id, searchDto.getIds()))
+                .and(SpecificationUtil.notEqualValue(Account_.id, authorId));
         if ((author = searchDto.getAuthor()) != null && !author.isBlank()) {
             authorNames = author.split(" ");
             if (authorNames.length == 2)
@@ -148,7 +151,7 @@ public class AccountService {
     }
 
     private Account getCurrentUserAccount() {
-        return accountRepository.getById(CurrentUserExtractor.getCurrentUser().getId());
+        return accountRepository.getById(CurrentUserExtractor.getCurrentUserFromAuthentication().getId());
     }
 
     private Account softDeleteById(UUID uuid) {

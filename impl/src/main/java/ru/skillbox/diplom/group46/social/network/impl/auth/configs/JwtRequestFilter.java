@@ -39,20 +39,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String jwt = extractAccessTokenFromCookie(request);
         log.debug("JWT token extracted from cookie: {}", jwt);
+        if (jwt != null) {
+            try {
+                BearerTokenAuthenticationToken bearerTokenAuthenticationToken = new BearerTokenAuthenticationToken(jwt);
+                bearerTokenAuthenticationToken.setAuthenticated(true);
+                log.debug("Bearer token: {}", jwt);
 
-        try {
-            BearerTokenAuthenticationToken bearerTokenAuthenticationToken = new BearerTokenAuthenticationToken(jwt);
-            bearerTokenAuthenticationToken.setAuthenticated(true);
-            log.debug("Bearer token: {}", jwt);
-
-            Authentication authentication = jwtAuthenticationProvider.authenticate(bearerTokenAuthenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(new JwtRequestWrapper(request, jwt), response);
-        } catch (Exception e) {
-            log.error("Exception occurred during authentication", e);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                Authentication authentication = jwtAuthenticationProvider.authenticate(bearerTokenAuthenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                filterChain.doFilter(new JwtRequestWrapper(request, jwt), response);
+            } catch (Exception e) {
+                log.error("Exception occurred during authentication", e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
         }
-
         if (jwt == null) {
             log.debug("Token not found in request body. Proceeding with filter chain.");
             filterChain.doFilter(request, response);

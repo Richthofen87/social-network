@@ -14,8 +14,6 @@ variables:
 jar-build:
   stage: build-jar
   image: maven:3.8.3-openjdk-17
-  tags:
-    - group46
   script:
     - echo "Building application..."
     - mvn clean package $MAVEN_OPTS_CLI -DskipTests
@@ -30,8 +28,6 @@ jar-build:
 docker-deploy:
   stage: deploy-docker
   image: docker:24.0.5
-  tags:
-    - group46
   environment: production
   script:
     - echo "Deploying application..."

@@ -13,5 +13,5 @@
     <include file="db/changelog/v1.0/friend_schema.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/v1.1_create_recovery_token_table.xml" relativeToChangelogFile="true"/>
     <include file="db/changelog/v1.0/audit.xml" relativeToChangelogFile="true"/>
-    <include file="db/changelog/v1.0/dialog.xml" relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
