@@ -73,6 +73,7 @@ public class AccountService {
         return accountMapper.entityToDto(account);
     }
 
+    @Transactional
     public AccountDto create(AccountDto accountDto) {
         log.debug("Method create(%s) started with param: \"%s\"".formatted(AccountDto.class, accountDto));
         return accountMapper.entityToDto(accountRepository.save(accountMapper.dtoToEntity(accountDto)));

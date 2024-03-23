@@ -24,7 +24,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications
+              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications, ru.skillbox.diplom.group46.social.network.api.dto.account
   mail:
     host: smtp.gmail.com
     port: 587

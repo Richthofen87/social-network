@@ -42,6 +42,16 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="add_indexes_to_account_table" author="Timur_Shaidullin">
+        <createIndex tableName="account" indexName="idx_last_online_time">
+            <column name="last_online_time"/>
+        </createIndex>
+
+        <createIndex tableName="account" indexName="idx_is_online">
+            <column name="is_online"/>
+        </createIndex>
+    </changeSet>
+
     <changeSet id="create role table" author="vladimir.sazonov">
         <createTable tableName="role">
             <column name="id" type="uuid">

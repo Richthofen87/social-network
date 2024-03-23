@@ -16,8 +16,8 @@ import ru.skillbox.diplom.group46.social.network.domain.friend.Friend_;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.friend.FriendRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 
-import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
 import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;

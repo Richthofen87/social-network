@@ -26,7 +26,7 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.post.CommentRep
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.LikeRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.TagRepository;
-import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
+import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
