@@ -62,14 +62,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/secured").authenticated()
-                        .requestMatchers("/info").authenticated()
-                        .requestMatchers("/api/v1/auth/admin/revokeUserTokens").authenticated()
-                        .requestMatchers("/admin/revokeAllTokens").authenticated()
+                        .requestMatchers("/api/v1/auth/captcha").permitAll()
                         .requestMatchers("/api/v1/auth/admin/*").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/user").hasRole("USER")
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 

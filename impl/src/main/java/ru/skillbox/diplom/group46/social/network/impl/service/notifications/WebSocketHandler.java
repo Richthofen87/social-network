@@ -10,11 +10,12 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.web_socket.SocketNotificationDto;
-import ru.skillbox.diplom.group46.social.network.impl.service.KafkaProducerService;
+import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -23,12 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
-    private final Map<String, WebSocketSession> sessionUserMap = new ConcurrentHashMap<>();
     private final KafkaProducerService kafkaProducerService;
+    private final Map<String, WebSocketSession> sessionUserMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        sessionUserMap.put((String) session.getAttributes().get("userId"), session);
+        String userId = (String) session.getAttributes().get("userId");
+        sessionUserMap.put(userId, session);
+        updateAccountStatus(UUID.fromString(userId), true);
     }
 
     public void sendMessage(Object object) throws IOException {
@@ -45,6 +48,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sessionUserMap.forEach((k, v) -> {
             if (v.getId().equals(sessionId)) sessionUserMap.remove(k);
         });
+
+        String userId = (String) session.getAttributes().get("userId");
+        updateAccountStatus(UUID.fromString(userId), false);
+    }
+
+    private void updateAccountStatus(UUID userId, boolean isOnline) {
+        log.debug("Updating account status for user {} to {}", userId, isOnline);
+        kafkaProducerService.sendAccountStatusUpdate(userId, isOnline);
     }
 
     @Override
