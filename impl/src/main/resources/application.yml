@@ -7,7 +7,6 @@ spring:
       client:
         enabled: false
   kafka:
-    bootstrap-servers: "localhost:9092"
     producer:
       bootstrap-servers: "localhost:9092"
       client-id: "noteProducer"
@@ -16,7 +15,6 @@ spring:
     consumer:
       group-id: "notesGroup"
       bootstrap-servers: "localhost:9092"
-      client-id: "notificationService"
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -67,7 +65,6 @@ spring:
 captcha:
   expiration: PT5M
   checkDelay: PT1M
-
 access-token:
   private: ${ACCESS_TOKEN_PRIVATE_KEY_PATH}
   public: ${ACCESS_TOKEN_PUBLIC_KEY_PATH}

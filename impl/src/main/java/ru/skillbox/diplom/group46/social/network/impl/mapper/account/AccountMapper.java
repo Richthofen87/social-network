@@ -7,13 +7,18 @@ import ru.skillbox.diplom.group46.social.network.domain.account.status_code.Stat
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-@Mapper(imports = {LocalDate.class, ZoneId.class, StatusCode.class},
+
+@Mapper(imports = {LocalDate.class, ZoneId.class, StatusCode.class, ZonedDateTime.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class AccountMapper {
 
     public abstract Account dtoToEntity(AccountDto accountDto);
-    @Mapping(target = "isDeleted", defaultValue = "false")
+
     public abstract AccountDto entityToDto(Account account);
+
+
     public abstract void update(@MappingTarget Account account, AccountDto accountDto);
 }

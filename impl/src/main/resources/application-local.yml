@@ -26,8 +26,8 @@ spring:
   liquibase:
     enabled: true
     drop-first: false
-    default-schema: social-network
-    liquibase-schema: social-network
+    default-schema: public
+    liquibase-schema: public
     change-log: classpath:database-social.network-changelog.xml
 
   datasource:
@@ -42,3 +42,4 @@ access-token:
 refresh-token:
   private: "access-refresh-token-keys/refresh-token-private.key"
   public: "access-refresh-token-keys/refresh-token-public.key"
+

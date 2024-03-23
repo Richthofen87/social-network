@@ -60,6 +60,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
+        log.info("Прием сообщения из сокета: {}", message.getPayload());
         kafkaProducerService.sendMessages(message.getPayload());
     }
 
