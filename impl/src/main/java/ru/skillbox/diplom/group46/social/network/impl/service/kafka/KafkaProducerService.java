@@ -44,6 +44,7 @@ public class KafkaProducerService {
     }
 
     public void sendMessages(String message) {
+        log.info("отправка сообщения в кафку: %s".formatted(message));
         CompletableFuture<SendResult<String, String>> future = kafkaTemplateMessage.send("messages", message);
         future.whenComplete((result, ex) -> {
             if (ex == null) log.info("Producer send %s, with offset %d"
