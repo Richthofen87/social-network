@@ -30,7 +30,7 @@ public class AccountDto extends BaseDto {
     private String statusCode;
     private ZonedDateTime birthDate;
     private String messagePermission;
-    private ZonedDateTime lastOnlineTime;
+    private Long lastOnlineTime;
     private Boolean isOnline;
     private Boolean isBlocked;
     private String emojiStatus;

@@ -65,8 +65,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/captcha").permitAll()
                         .requestMatchers("/api/v1/auth/admin/*").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .sessionManagement((sessionManagement) ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .oauth2ResourceServer((oauth2) ->
                         oauth2.jwt((jwt) -> jwt.jwtAuthenticationConverter(jwtToUserConverter)))

@@ -11,11 +11,11 @@ public class AccountStatusMessage {
     private UUID userId;
     @JsonProperty("isOnline")
     private boolean isOnline;
-    private ZonedDateTime lastLoginTime;
+    private Long lastLoginTime;
 
     public AccountStatusMessage(@JsonProperty("userId") UUID userId,
                                 @JsonProperty("isOnline") boolean isOnline,
-                                @JsonProperty("lastLoginTime") ZonedDateTime lastLoginTime) {
+                                @JsonProperty("lastLoginTime") Long lastLoginTime) {
         this.userId = userId;
         this.isOnline = isOnline;
         this.lastLoginTime = lastLoginTime;
