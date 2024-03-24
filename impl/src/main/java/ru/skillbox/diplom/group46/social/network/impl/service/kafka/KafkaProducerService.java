@@ -54,7 +54,8 @@ public class KafkaProducerService {
     }
 
     public void sendAccountStatusUpdate(UUID userId, boolean isOnline) {
-        AccountStatusMessage statusMessage = new AccountStatusMessage(userId, isOnline, ZonedDateTime.now());
+        long currentTimeMillis = System.currentTimeMillis();
+        AccountStatusMessage statusMessage = new AccountStatusMessage(userId, isOnline, currentTimeMillis);
         log.debug("Sending account status update for user {}: {}", userId, statusMessage);
         CompletableFuture<SendResult<String, AccountStatusMessage>> future = kafkaTemplateStatus.send("isOnline", statusMessage);
         future.whenComplete((result, ex) -> {

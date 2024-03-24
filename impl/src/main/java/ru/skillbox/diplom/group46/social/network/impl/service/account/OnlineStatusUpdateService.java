@@ -8,6 +8,8 @@ import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountStatusMe
 import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Slf4j
@@ -21,18 +23,13 @@ public class OnlineStatusUpdateService {
     public void changeStatus(AccountStatusMessage statusMessage) {
         Account account = accountRepository.getById(statusMessage.getUserId());
         boolean isOnline = statusMessage.isOnline();
-        ZonedDateTime lastOnlineTime = statusMessage.getLastLoginTime();
+        Long lastOnlineTimeMillis = statusMessage.getLastLoginTime();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+        // актуально
         if (account != null) {
             account.setIsOnline(isOnline);
-            account.setLastOnlineTime(ZonedDateTime.from(lastOnlineTime));
-            accountRepository.save(account);
+            ZonedDateTime lastOnlineTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(lastOnlineTimeMillis), ZoneId.systemDefault());
+            account.setLastOnlineTime(lastOnlineTime);
             log.debug("User {} is now {}", statusMessage.getUserId(), isOnline ? "online" : "offline");
         } else {
             log.warn("Account with id {} not found", statusMessage.getUserId());
