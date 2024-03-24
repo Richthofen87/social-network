@@ -145,6 +145,8 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(registrationDto.getPassword1()));
         account.setCreatedDate(ZonedDateTime.now());
         account.setRegDate(ZonedDateTime.now());
+        account.setLastOnlineTime(ZonedDateTime.now());
+        account.setIsOnline(false);
         account.addRole(roleService.getUserRole());
         accountRepository.save(account);
         notificationsService.setSettings(account.getId().toString());
