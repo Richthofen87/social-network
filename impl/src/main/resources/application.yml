@@ -12,6 +12,7 @@ spring:
       client-id: "noteProducer"
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
     consumer:
       group-id: "notesGroup"
       bootstrap-servers: "localhost:9092"
@@ -22,7 +23,8 @@ spring:
         spring:
           json:
             trusted:
-              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications, ru.skillbox.diplom.group46.social.network.api.dto.account
+              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications, ru.skillbox.diplom.group46.social.network.api.dto.account,ru.skillbox.diplom.group46.social.network.api.dto.dialog
+
   mail:
     host: smtp.gmail.com
     port: 587
