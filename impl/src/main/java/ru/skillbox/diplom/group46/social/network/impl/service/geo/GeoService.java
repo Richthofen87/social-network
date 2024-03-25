@@ -35,7 +35,7 @@ public class GeoService {
     private final JsonCityMapper jsonCityMapper;
 
     @SneakyThrows
-    public List<CountryDto> load() {
+    public List<CountryDto> getLoad() {
         File city = new File("city.json"); // Создается файл json
         new FileOutputStream(city, false).close(); // Стирание старых данных, для записи новых
         FileOutputStream cityStream = new FileOutputStream(city);
@@ -85,6 +85,9 @@ public class GeoService {
 
     public List<CountryDto> getCountry() {
          log.info("GeoService.getCountry - start method");
+        if (countryRepository.findAll().isEmpty()) {
+            getLoad();
+        }
         return countryMapper.countryToDtoList(countryRepository.findAll());
     }
     @Transactional(readOnly = true)
