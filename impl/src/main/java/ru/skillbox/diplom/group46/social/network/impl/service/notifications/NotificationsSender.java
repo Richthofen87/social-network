@@ -17,7 +17,8 @@ public class NotificationsSender {
     private Boolean enableMsNotifications;
     private final WebSocketService webSocketService;
 
-    @KafkaListener(topics = "notifications-2", groupId = "notesGroup-1")
+    @KafkaListener(topics = "notifications-2", groupId = "notesGroup-1",
+            containerFactory = "kafkaNotificationDtoListenerContainerFactory")
     protected void consume(NotificationDto dto) {
         log.info("Method consume({}) started with param: \"{}\"",
                 NotificationDto.class, dto);

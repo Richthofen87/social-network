@@ -2,10 +2,10 @@ server:
   port: 8080
 
 spring:
-  boot:
-    admin:
-      client:
-        enabled: false
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    consumer:
+      auto-offset-reset: earliest
 
   mail:
     host: smtp.gmail.com
@@ -49,4 +49,7 @@ cloud:
   apiSecret:  "ZXCMrXel_tH2e7Sch_Mk0W_SCtA"
 
 microservices:
-  enableMsNotifications: false
+  enableMsNotifications: true
+
+notificationsApi:
+  url: "localhost:8088"

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "notifications-service",url = "http://localhost:8088/api/v1/notifications")
+@FeignClient(name = "notifications-service",url = "http://${notificationsApi.url}/api/v1/notifications")
 public interface NotificationsClient {
 
     @PutMapping("/softDeleteFriendRequests")

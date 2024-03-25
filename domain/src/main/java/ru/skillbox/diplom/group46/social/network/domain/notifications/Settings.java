@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group46.social.network.domain.notifications;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
@@ -65,6 +66,7 @@ public class Settings extends BaseEntity {
     @Column(name = "enable_user_birthday")
     private Boolean enableUserBirthday = true;
 
+    @JsonIgnore
     public Map<String, Boolean> getProperties() {
         return new HashMap<>() {{
             put("LIKE", getEnableLike());
@@ -83,6 +85,7 @@ public class Settings extends BaseEntity {
         }};
     }
 
+    @JsonIgnore
     public Map<String, Consumer<Boolean>> getPropertiesToSet() {
         return new HashMap<>() {{
             put("LIKE", (enable) -> setEnableLike(enable));
