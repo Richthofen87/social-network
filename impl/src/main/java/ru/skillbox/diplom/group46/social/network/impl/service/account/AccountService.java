@@ -12,12 +12,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountUpdateDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account;
 import ru.skillbox.diplom.group46.social.network.domain.account.Account_;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.Settings;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.account.AccountRepository;
-import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsService;
+import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.SettingsRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
@@ -40,18 +42,20 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
-    private final NotificationsService notificationsService;
+    private final SettingsRepository settingsRepository;
 
     public AccountDto get() {
         log.debug("Method get started()");
         return accountMapper.entityToDto(getCurrentUserAccount());
     }
 
-    public AccountDto updateCurrent(AccountDto accountDto) {
-        log.debug("Method updateCurrent(%s) started with param: \"%s\"".formatted(AccountDto.class, accountDto));
+    public AccountUpdateDto updateCurrent(AccountUpdateDto dto) {
+        log.debug("Method updateCurrent(%s) started with param: \"%s\""
+                .formatted(AccountUpdateDto.class, dto));
         Account account = getCurrentUserAccount();
-        accountMapper.update(account, accountDto);
-        return accountMapper.entityToDto(account);
+        accountMapper.update(account, dto);
+        accountRepository.save(account);
+        return accountMapper.entityToUpdateDto(account);
     }
 
     public Boolean delete() {
@@ -149,7 +153,8 @@ public class AccountService {
         account.setIsOnline(false);
         account.addRole(roleService.getUserRole());
         accountRepository.save(account);
-        notificationsService.setSettings(account.getId().toString());
+        Settings settings = new Settings(account.getId());
+        settingsRepository.save(settings);
         return account;
     }
 

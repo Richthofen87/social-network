@@ -4,14 +4,12 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ru.skillbox.diplom.group46.social.network.api.exception.auth.AuthenticationError;
 import ru.skillbox.diplom.group46.social.network.domain.exception.captcha.CaptchaException;
 
 @Slf4j
@@ -21,27 +19,16 @@ public class ExceptionAdvice {
 
     @ExceptionHandler({EntityNotFoundException.class, EntityExistsException.class})
     public ErrorResponse handleException(Throwable ex) {
-        log.warn("Method handleException(%s) started with param: \"%s\", cause: \"%s\""
+        log.warn("\"%s\": \"%s\" cause: \"%s\""
                 .formatted(Throwable.class, ex, ex.getCause()));
         return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler({CaptchaException.class, AuthenticationCredentialsNotFoundException.class, AuthenticationError.class})
-    public ResponseEntity handleAuthException(Throwable ex) {
-        log.warn("Method handleAuthException(%s) started with param: \"%s\", cause: \"%s\""
+    @ExceptionHandler({CaptchaException.class, AuthenticationCredentialsNotFoundException.class,
+            BadCredentialsException.class})
+    public ErrorResponse handleAuthException(Throwable ex) {
+        log.warn("\"%s\": \"%s\" cause: \"%s\""
                 .formatted(Throwable.class, ex, ex.getCause()));
-        if (ex instanceof AuthenticationError) {
-            AuthenticationError authError = (AuthenticationError) ex;
-            log.warn("AuthenticationError: status={}, MessageDto={}", authError.getStatus(), authError.getMessage());
-        }
-        // return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return ResponseEntity.status(401).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ErrorResponse handleBadCredentialsException(BadCredentialsException ex) {
-        log.warn("Method handleBadCredentialsException(%s) started with param: \"%s\", cause: \"%s\""
-                .formatted(BadCredentialsException.class, ex, ex.getCause()));
-        return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, "Неверный или протухший токен");
+        return ErrorResponse.create(ex, HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 }

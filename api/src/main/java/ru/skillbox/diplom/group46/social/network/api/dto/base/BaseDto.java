@@ -7,5 +7,5 @@ import java.util.UUID;
 @Data
 public class BaseDto implements Serializable {
     private UUID id;
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 }

@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.skillbox.diplom.group46.social.network.impl.repository.base.BaseRepositoryImpl;
 import ru.skillbox.diplom.group46.social.network.impl.service.geo.GeoClient;
+import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsClient;
 
 /**
  * Application
@@ -25,7 +26,7 @@ import ru.skillbox.diplom.group46.social.network.impl.service.geo.GeoClient;
 @SpringBootApplication
 @EntityScan("ru.skillbox.diplom.group46.social.network.domain")
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
-@EnableFeignClients(basePackageClasses = GeoClient.class)
+@EnableFeignClients(basePackageClasses = {GeoClient.class, NotificationsClient.class})
 public class Application {
 
     public static void main(String[] args) {

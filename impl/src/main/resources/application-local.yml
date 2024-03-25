@@ -26,8 +26,8 @@ spring:
   liquibase:
     enabled: true
     drop-first: false
-    default-schema: public
-    liquibase-schema: public
+    default-schema: social-network
+    liquibase-schema: social-network
     change-log: classpath:database-social.network-changelog.xml
 
   datasource:
@@ -43,3 +43,10 @@ refresh-token:
   private: "access-refresh-token-keys/refresh-token-private.key"
   public: "access-refresh-token-keys/refresh-token-public.key"
 
+cloud:
+  cloudName: "dcxq7fexc"
+  apiKey: "277947738682614"
+  apiSecret:  "ZXCMrXel_tH2e7Sch_Mk0W_SCtA"
+
+microservices:
+  enableMsNotifications: false

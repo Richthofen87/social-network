@@ -65,4 +65,7 @@ public class Account extends User {
 
     @Column(name = "deletion_timestamp")
     private ZonedDateTime deletionTimestamp;
+
+    @Column(name = "last_modified_date")
+    private ZonedDateTime lastModifiedDate;
 }

@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.notifications;
+package ru.skillbox.diplom.group46.social.network.impl.service.web_socket;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
