@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.notifications;
+package ru.skillbox.diplom.group46.social.network.impl.service.web_socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.web_socket.SocketNotificationDto;
 import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 
@@ -36,8 +35,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     public void sendMessage(Object object) throws IOException {
         String json = objectMapper.writeValueAsString(object);
-        if (object instanceof SocketNotificationDto<?>) {
-            String userId = ((SocketNotificationDto<NotificationDto>) object).getData().getAuthorId().toString();
+        if (object instanceof SocketNotificationDto) {
+            String userId = ((SocketNotificationDto) object).getData().getAuthorId().toString();
             sessionUserMap.get(userId).sendMessage(new TextMessage(json));
         }
     }

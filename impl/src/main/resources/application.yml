@@ -6,16 +6,18 @@ spring:
     admin:
       client:
         enabled: false
+
   kafka:
     producer:
       bootstrap-servers: "localhost:9092"
-      client-id: "noteProducer"
+      client-id: "noteProducer-1"
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
-      group-id: "notesGroup"
+      group-id: "notesGroup-1"
       bootstrap-servers: "localhost:9092"
+      client-id: "social-network"
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -67,6 +69,7 @@ spring:
 captcha:
   expiration: PT5M
   checkDelay: PT1M
+
 access-token:
   private: ${ACCESS_TOKEN_PRIVATE_KEY_PATH}
   public: ${ACCESS_TOKEN_PUBLIC_KEY_PATH}
@@ -78,5 +81,8 @@ cloud:
   cloudName: ${CLOUD_NAME}
   apiKey: ${API_KEY}
   apiSecret:  ${API_SECRET}
+
+microservices:
+  enableMsNotifications: ${ENABLE_MS_NOTIFICATIONS}
 
 

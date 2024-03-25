@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group46.social.network.impl.service.notifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,10 @@ import ru.skillbox.diplom.group46.social.network.domain.notifications.Settings;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.notifications.NotificationMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.NotificationRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.SettingsRepository;
+import ru.skillbox.diplom.group46.social.network.impl.service.web_socket.WebSocketService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +38,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationsService {
 
+    @Value("${microservices.enableMsNotifications}")
+    private Boolean enableMsNotifications;
     private final WebSocketService webSocketService;
     private final SettingsRepository settingsRepository;
     private final NotificationMapper notificationMapper;
@@ -115,10 +118,11 @@ public class NotificationsService {
         return partCountDto;
     }
 
-    @KafkaListener(topics = "notifications", groupId = "notesGroup")
+    @KafkaListener(topics = "notifications-1", groupId = "notesGroup-1")
     protected void consume(NotificationDto dto) {
         log.info("Method consume(%s) started with param: \"%s\""
                 .formatted(NotificationDto.class, dto));
+        if (enableMsNotifications) return;
         sendNotificationsToFriends(dto);
     }
 
@@ -132,10 +136,15 @@ public class NotificationsService {
                 });
     }
 
-    public void softDeleteFriendRequests(UUID authorId, UUID friendId) {
+    public boolean softDeleteFriendRequests(UUID authorId, UUID friendId) {
         List<Notification> notes = notificationRepository
                 .findAllByAuthorIdAndReceiverIdAndNotificationType(authorId, friendId, NotificationType.FRIEND_REQUEST);
         notificationRepository.deleteAll(notes);
+        Specification<Notification> spec = SpecificationUtil
+                .equalValue(Notification_.receiverId, friendId)
+                .and(SpecificationUtil.equalValue(Notification_.authorId, authorId))
+                .and(SpecificationUtil.equalValue(Notification_.notificationType, NotificationType.FRIEND_REQUEST));
+        return notificationRepository.findAll(spec).isEmpty();
     }
 
     private UUID getCurrentUserId() {

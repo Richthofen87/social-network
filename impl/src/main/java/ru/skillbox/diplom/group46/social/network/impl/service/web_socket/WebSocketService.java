@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group46.social.network.impl.service.notifications;
+package ru.skillbox.diplom.group46.social.network.impl.service.web_socket;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class WebSocketService {
         log.debug("Method getNotificationsToSend(%s) started with param: \"%s\""
                 .formatted(NotificationDto.class, dto));
         try {
-            SocketNotificationDto<NotificationDto> socketDto = new SocketNotificationDto<>();
+            SocketNotificationDto socketDto = new SocketNotificationDto();
             socketDto.setRecipientId(dto.getReceiverId());
             socketDto.setData(dto);
             handler.sendMessage(socketDto);

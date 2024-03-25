@@ -39,6 +39,7 @@
             <column name="is_blocked" type="boolean"/>
             <column name="emoji_status" type="varchar(255)"/>
             <column name="deletion_timestamp" type="timestamptz"/>
+            <column name="last_modified_date" type="timestamptz"/>
         </createTable>
     </changeSet>
 

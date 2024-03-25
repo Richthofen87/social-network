@@ -35,10 +35,10 @@ public class KafkaProducerService {
     public void sendNotification(UUID authorId, UUID receiverId, String content,
                                  NotificationType notificationType) {
         NotificationDto dto = new NotificationDto(authorId, receiverId, content,
-                notificationType, ZonedDateTime.now().toEpochSecond(), NotificationStatus.SEND);
+                notificationType, ZonedDateTime.now().toInstant().toEpochMilli(), NotificationStatus.SEND);
         log.debug("Method sendNotification(%s, %s, %s) started with params: \"%s\", \"%s\", \"%s\""
                 .formatted(UUID.class, String.class, NotificationType.class, authorId, content, notificationType));
-        CompletableFuture<SendResult<String, NotificationDto>> future = kafkaTemplateNotification.send("notifications", dto);
+        CompletableFuture<SendResult<String, NotificationDto>> future = kafkaTemplateNotification.send("notifications-1", dto);
         future.whenComplete((result, ex) -> {
             if (ex == null) log.info("Producer send %s, with offset %d"
                     .formatted(dto, result.getRecordMetadata().offset()));

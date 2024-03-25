@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountUpdateDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.base.BaseController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,7 +25,7 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
     ResponseEntity<AccountDto> get();
 
     @PutMapping("/me")
-    ResponseEntity<AccountDto> updateCurrent(@RequestBody AccountDto accountDto);
+    ResponseEntity<AccountUpdateDto> updateCurrent(@RequestBody AccountUpdateDto dto);
 
     @DeleteMapping("/me")
     ResponseEntity<Boolean> delete();
@@ -34,10 +34,10 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
     ResponseEntity<AccountDto> getByEmail(@RequestParam String email);
 
     @PutMapping
-    ResponseEntity<AccountDto> updateAndGet(@RequestBody AccountDto accountDto);
+    ResponseEntity<AccountDto> updateAndGet(@RequestBody AccountDto dto);
 
     @PostMapping
-    ResponseEntity<AccountDto> createAndGet(@RequestBody AccountDto accountDto);
+    ResponseEntity<AccountDto> createAndGet(@RequestBody AccountDto dto);
 
     @GetMapping("/{id}")
     ResponseEntity<AccountDto> getById(@PathVariable("id") UUID id);
@@ -46,6 +46,6 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
     ResponseEntity<Boolean> deleteAccountById(@PathVariable("id") UUID id);
 
     @GetMapping("/search")
-    ResponseEntity<Page<AccountDto>> getAll(AccountSearchDto accountSearchDto,
-                                            Pageable Pageable);
+    ResponseEntity<Page<AccountDto>> getAll(AccountSearchDto searchDto,
+                                            Pageable pageable);
 }

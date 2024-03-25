@@ -21,7 +21,9 @@ public class KafkaConfig {
     @Bean
     public KafkaAdmin.NewTopics topic() {
         List<NewTopic> topics = new ArrayList<>();
-        topics.add(TopicBuilder.name("notifications").partitions(1).replicas(1).build());
+        topics.add(TopicBuilder.name("notifications-1").partitions(1).replicas(1).build());
+        topics.add(TopicBuilder.name("notifications-2").partitions(1).replicas(1).build());
+        topics.add(TopicBuilder.name("messages").partitions(1).replicas(1).build());
         topics.add(TopicBuilder.name("isOnline").partitions(1).replicas(1).build());
         return new KafkaAdmin.NewTopics(topics.toArray(NewTopic[]::new));
     }

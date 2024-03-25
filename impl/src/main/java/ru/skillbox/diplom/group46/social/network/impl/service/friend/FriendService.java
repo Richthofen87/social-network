@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group46.social.network.impl.service.friend;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,7 @@ import ru.skillbox.diplom.group46.social.network.impl.mapper.friend.FriendMapper
 import ru.skillbox.diplom.group46.social.network.impl.repository.friend.FriendRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 
+import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsClient;
 import ru.skillbox.diplom.group46.social.network.impl.service.notifications.NotificationsService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
@@ -30,10 +32,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FriendService {
 
-    private final NotificationsService notificationsService;
+    @Value("${microservices.enableMsNotifications}")
+    private Boolean enableMsNotifications;
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
+    private final NotificationsClient notificationsClient;
     private final KafkaProducerService kafkaProducerService;
+    private final NotificationsService notificationsService;
 
     //Одобрение запроса на дружбу по id
     public FriendDto addFriend(UUID friendId) {
@@ -126,7 +131,8 @@ public class FriendService {
         author = setStatusCode(StatusCode.NONE.toString(), author, getAuthorId(), friendId);
         friendRepository.saveAndFlush(author);
         friendRepository.saveAndFlush(friend);
-        notificationsService.softDeleteFriendRequests(getAuthorId(), friendId);
+        if (enableMsNotifications) notificationsClient.softDeleteFriendRequests(getAuthorId(), friendId);
+        else notificationsService.softDeleteFriendRequests(getAuthorId(), friendId);
     }
 
     //Получение пользователей по статусу отношений

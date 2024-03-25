@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.account.AccountUpdateDto;
 import ru.skillbox.diplom.group46.social.network.api.resource.account.AccountController;
 import ru.skillbox.diplom.group46.social.network.impl.service.account.AccountService;
 
@@ -33,10 +34,10 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public ResponseEntity<AccountDto> updateCurrent(AccountDto accountDto) {
+    public ResponseEntity<AccountUpdateDto> updateCurrent(AccountUpdateDto dto) {
         log.debug("Method updateCurrent(%s) started with param: \"%s\""
-                .formatted(AccountDto.class, accountDto));
-        return ResponseEntity.ok(accountService.updateCurrent(accountDto));
+                .formatted(AccountUpdateDto.class, dto));
+        return ResponseEntity.ok(accountService.updateCurrent(dto));
     }
 
     @Override
@@ -53,17 +54,17 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public ResponseEntity<AccountDto> updateAndGet(AccountDto accountDto) {
+    public ResponseEntity<AccountDto> updateAndGet(AccountDto dto) {
         log.debug("Method updateAndGet(%s) started with param: \"%s\""
-                .formatted(AccountDto.class, accountDto));
-        return ResponseEntity.ok(accountService.update(accountDto));
+                .formatted(AccountDto.class, dto));
+        return ResponseEntity.ok(accountService.update(dto));
     }
 
     @Override
-    public ResponseEntity<AccountDto> createAndGet(AccountDto accountDto) {
+    public ResponseEntity<AccountDto> createAndGet(AccountDto dto) {
         log.debug("Method createAndGet(%s) started with param: \"%s\""
-                .formatted(AccountDto.class, accountDto));
-        return ResponseEntity.ok(accountService.create(accountDto));
+                .formatted(AccountDto.class, dto));
+        return ResponseEntity.ok(accountService.create(dto));
     }
 
     @Override
@@ -88,10 +89,10 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public void create(AccountDto accountDto) {
+    public void create(AccountDto dto) {
         log.debug("Method create(%s) started with param: \"%s\""
-                .formatted(AccountDto.class, accountDto));
-       accountService.create(accountDto);
+                .formatted(AccountDto.class, dto));
+       accountService.create(dto);
     }
 
     @Override
@@ -102,9 +103,9 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public void update(AccountDto accountDto) {
+    public void update(AccountDto dto) {
         log.debug("Method update(%s) started with param: \"%s\""
-                .formatted(AccountDto.class, accountDto));
-        accountService.update(accountDto);
+                .formatted(AccountDto.class, dto));
+        accountService.update(dto);
     }
 }
