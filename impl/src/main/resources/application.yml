@@ -2,30 +2,10 @@ server:
   port: 8080
 
 spring:
-  boot:
-    admin:
-      client:
-        enabled: false
-
   kafka:
-    producer:
-      bootstrap-servers: "localhost:9092"
-      client-id: "noteProducer-1"
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
+    bootstrap-servers: ${BOOTSTRAP_SERVERS}
     consumer:
-      group-id: "notesGroup-1"
-      bootstrap-servers: "localhost:9092"
-      client-id: "social-network"
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: ru.skillbox.diplom.group46.social.network.api.dto.notifications, ru.skillbox.diplom.group46.social.network.api.dto.account,ru.skillbox.diplom.group46.social.network.api.dto.dialog
+      auto-offset-reset: ${AUTO_OFFSET_RESET}
 
   mail:
     host: smtp.gmail.com
@@ -85,4 +65,5 @@ cloud:
 microservices:
   enableMsNotifications: ${ENABLE_MS_NOTIFICATIONS}
 
-
+notificationsApi:
+  url: ${NOTIFICATIONS_API_URL}

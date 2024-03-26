@@ -14,7 +14,8 @@ public class KafkaStatusListener {
 
     private final OnlineStatusUpdateService onlineStatusUpdateService;
 
-    @KafkaListener(topics = "isOnline")
+    @KafkaListener(topics = "isOnline", groupId = "notesGroup-1",
+            containerFactory = "kafkaAccountStatusMessageListenerContainerFactory")
     public void consumerStatus(AccountStatusMessage statusMessage) {
         try {
             log.debug("Method consumerStatus started with params: {}", statusMessage);
@@ -23,5 +24,4 @@ public class KafkaStatusListener {
             log.error("Error processing account status update message", e);
         }
     }
-
 }

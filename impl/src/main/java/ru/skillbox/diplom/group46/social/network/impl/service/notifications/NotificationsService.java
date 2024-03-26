@@ -118,7 +118,8 @@ public class NotificationsService {
         return partCountDto;
     }
 
-    @KafkaListener(topics = "notifications-1", groupId = "notesGroup-1")
+    @KafkaListener(topics = "notifications-1", groupId = "notesGroup-1",
+            containerFactory = "kafkaNotificationDtoListenerContainerFactory")
     protected void consume(NotificationDto dto) {
         log.info("Method consume(%s) started with param: \"%s\""
                 .formatted(NotificationDto.class, dto));

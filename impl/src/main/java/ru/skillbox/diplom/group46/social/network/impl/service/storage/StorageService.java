@@ -9,10 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class StorageService {
+
     private final Cloudinary cloudinary;
     public String uploadFile(MultipartFile file) throws IOException {
         log.info("Upload new file {} and byte {}",file.getName(), file.getBytes().length);
