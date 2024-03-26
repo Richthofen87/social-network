@@ -26,9 +26,9 @@ public  class GeoControllerImpl implements GeoController {
 
     private final GeoService geoService;
     @Override
-    public ResponseEntity<CountryDto> load() {
+    public ResponseEntity <List<CountryDto>> load() {
         log.info("GeoControllerImpl.load - start method");
-        return ResponseEntity.ok((CountryDto) geoService.load());
+        return ResponseEntity.ok(geoService.getLoad());
     }
 
     @Override

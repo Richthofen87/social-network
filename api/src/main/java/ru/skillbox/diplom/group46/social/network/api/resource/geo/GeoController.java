@@ -18,7 +18,7 @@ import java.util.UUID;
 public interface GeoController  {
 
     @PutMapping("/load")
-    ResponseEntity<CountryDto> load();
+    ResponseEntity <List<CountryDto>> load();
 
     @GetMapping("/country")
     ResponseEntity<List<CountryDto>> country();
