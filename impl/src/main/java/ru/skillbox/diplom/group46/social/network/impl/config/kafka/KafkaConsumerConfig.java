@@ -35,9 +35,9 @@ public class KafkaConsumerConfig {
             put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
             put(JsonDeserializer.TYPE_MAPPINGS,
-                    "a: ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto, " +
-                    "b: ru.skillbox.diplom.group46.social.network.api.dto.dialog.MessageDto, " +
-                    "c: ru.skillbox.diplom.group46.social.network.api.dto.account.AccountStatusMessage");
+                    "notificationDto: ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto, " +
+                            "messageDto: ru.skillbox.diplom.group46.social.network.api.dto.dialog.MessageDto, " +
+                            "accountStatusMessage: ru.skillbox.diplom.group46.social.network.api.dto.account.AccountStatusMessage");
         }};
     }
 
