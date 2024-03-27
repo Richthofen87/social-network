@@ -36,12 +36,12 @@ public class GeoService {
 
     @SneakyThrows
     public List<CountryDto> getLoad() {
-        File city = new File("city.json"); // Создается файл json
-        new FileOutputStream(city, false).close(); // Стирание старых данных, для записи новых
-        FileOutputStream cityStream = new FileOutputStream(city);
-        byte[] cities = geoClient.getListCities().getBytes(); // получение массива байтов из сайта
-        cityStream.write(cities); // запись массиива полученных байтов в выходной поток
-        cityStream.close(); // закрываем выходной потое
+//        File city = new File("city.json"); // Создается файл json
+//        new FileOutputStream(city, false).close(); // Стирание старых данных, для записи новых
+//        FileOutputStream cityStream = new FileOutputStream(city);
+//        byte[] cities = geoClient.getListCities().getBytes(); // получение массива байтов из сайта
+//        cityStream.write(cities); // запись массиива полученных байтов в выходной поток
+//        cityStream.close(); // закрываем выходной потое
 
         FileReader fileReader = new FileReader("city.json"); // чтение
         Gson gson = new Gson();
