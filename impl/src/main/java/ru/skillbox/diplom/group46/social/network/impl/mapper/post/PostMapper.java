@@ -7,7 +7,6 @@ import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeD
 import ru.skillbox.diplom.group46.social.network.domain.post.Post;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Mapper(imports = {UUID.class, ZonedDateTime.class, CommentTypeDto.class},
@@ -20,15 +19,12 @@ public interface PostMapper {
     @Mapping(target = "isBlocked", defaultValue = "false")
     @Mapping(target = "time", expression = "java(ZonedDateTime.now())")
     @Mapping(target = "timeChanged",expression = "java(ZonedDateTime.now())")
-    @Mapping(target = "publishDate", expression = "java(ZonedDateTime.now())")
+    @Mapping(target = "publishDate", expression = "java(postDto.getPublishDate() != null ? postDto.getPublishDate() : ZonedDateTime.now())")
     @Mapping(target = "imagePath", defaultValue = "https://res.cloudinary.com/net/image/upload/v1700829702/fizdftx3pyrpa36vnhpp.jpg")
-    Post postDtoToPostEntity (PostDto postDto);
-
+    Post postDtoToPostEntity(PostDto postDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     PostDto postEntityToPostDto(Post post);
-
-    List<PostDto> postEntitySetToPostDtoSet(List<Post> postSet);
 
     @InheritInverseConfiguration
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -26,15 +26,7 @@ public class CurrentUserExtractor {
         staticExtractor = extractor;
     }
 
-    @Deprecated
-    public static UserDTO getCurrentUser() {
-        log.debug("Method getCurrentUser() started");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return staticExtractor.getUserFromToken(((Jwt) authentication.getPrincipal()).getTokenValue());
-
-    }
-
-    public static UserDTO getCurrentUserFromAuthentication() {
+    public static UserDTO getCurrentUserFromAuthentication() throws NullPointerException {
         log.debug("Method getCurrentUser() started");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return staticExtractor.getUserFromAuthentication(authentication);

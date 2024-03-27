@@ -11,12 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.group46.social.network.api.dto.notifications.*;
-import ru.skillbox.diplom.group46.social.network.domain.notifications.Notification;
-import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationStatus;
-import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
-import ru.skillbox.diplom.group46.social.network.domain.notifications.Notification_;
-import ru.skillbox.diplom.group46.social.network.domain.notifications.Settings;
+import ru.skillbox.diplom.group46.social.network.api.dto.notifications.ContentDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.notifications.PartCountDto;
+import ru.skillbox.diplom.group46.social.network.api.dto.notifications.SettingUpdateDTO;
+import ru.skillbox.diplom.group46.social.network.domain.notifications.*;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.notifications.NotificationMapper;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.NotificationRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.notifications.SettingsRepository;
@@ -110,7 +109,7 @@ public class NotificationsService {
 
     public PartCountDto getSendNotificationCount() {
         log.debug("Method getSendNotificationCount() started");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         int count = notificationRepository
                 .countAllByReceiverIdAndStatusAndIsDeleted(authorId, NotificationStatus.SEND, false);
         PartCountDto partCountDto = new PartCountDto();
@@ -150,6 +149,6 @@ public class NotificationsService {
 
     private UUID getCurrentUserId() {
         log.debug("Method getCurrentUserId() started");
-        return CurrentUserExtractor.getCurrentUser().getId();
+        return CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
     }
 }

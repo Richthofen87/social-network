@@ -25,7 +25,7 @@ public class PostControllerImpl implements PostController {
     @Override
     public ResponseEntity<Page<PostDto>> get(PostSearchDto postSearchDto, Pageable pageable) {
         log.info("PostControllerImpl.get() StartMethod");
-        return ResponseEntity.ok(postService.get(postSearchDto, pageable));
+        return ResponseEntity.ok(postService.getPostsUser(postSearchDto, pageable));
     }
 
     @Override
@@ -41,8 +41,8 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<CommentDto> updateComment(UUID postId,CommentDto comment) {
-        return ResponseEntity.ok(commentService.updateComment(comment, postId));
+    public ResponseEntity<CommentDto> updateComment(CommentDto comment) {
+        return ResponseEntity.ok(commentService.updateComment(comment));
     }
 
     @Override
@@ -57,13 +57,7 @@ public class PostControllerImpl implements PostController {
 
     @Override
     public ResponseEntity<String> deleteComment(UUID commentId) {
-        return ResponseEntity.ok(postService.deleteComment(commentId));
-    }
-
-    @Override
-    public ResponseEntity<Void> updateDelayedPost(PostDto post) {
-        return null;
-//        return ResponseEntity.ok(postService.updateDelayedPost(post));
+        return ResponseEntity.ok(commentService.deleteComment(commentId));
     }
 
     @Override
@@ -98,8 +92,8 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<PostDto> getPost(String id) {
-        return ResponseEntity.ok(postService.getPost(id));
+    public ResponseEntity<Page<PostDto>> getNewsPosts(PostSearchDto postSearchDto, Pageable pageable){
+        return ResponseEntity.ok(postService.getNewsPosts(postSearchDto, pageable));
     }
 
     @Override

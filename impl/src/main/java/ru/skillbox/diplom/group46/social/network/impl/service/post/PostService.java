@@ -12,13 +12,13 @@ import ru.skillbox.diplom.group46.social.network.api.dto.post.LikeDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.PostSearchDto;
 import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.CommentTypeDto;
-import ru.skillbox.diplom.group46.social.network.api.dto.post.enums.TypeDto;
 import ru.skillbox.diplom.group46.social.network.domain.notifications.NotificationType;
 import ru.skillbox.diplom.group46.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group46.social.network.domain.post.Like;
 import ru.skillbox.diplom.group46.social.network.domain.post.Post;
 import ru.skillbox.diplom.group46.social.network.domain.post.Post_;
 import ru.skillbox.diplom.group46.social.network.domain.tag.Tag;
+import ru.skillbox.diplom.group46.social.network.domain.user.User;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.post.LikeMapper;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.post.PostMapper;
 import ru.skillbox.diplom.group46.social.network.impl.mapper.post.TagMapper;
@@ -26,6 +26,7 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.post.CommentRep
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.LikeRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group46.social.network.impl.repository.post.TagRepository;
+import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserRepository;
 import ru.skillbox.diplom.group46.social.network.impl.service.kafka.KafkaProducerService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 import ru.skillbox.diplom.group46.social.network.impl.utils.specification.SpecificationUtil;
@@ -46,6 +47,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
+    private final UserRepository userRepository;
     private final LikeMapper likeMapper;
     private final TagMapper tagMapper;
     private final LikeRepository likeRepository;
@@ -54,8 +56,7 @@ public class PostService {
 
     public PostDto create(PostDto postDto) {
         log.info("PostService.create() StartMethod");
-        postDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
-        postDto.setType(TypeDto.POSTED);
+        postDto.setAuthorId(CurrentUserExtractor.getCurrentUserFromAuthentication().getId());
 
         Post post = postMapper.postDtoToPostEntity(postDto);
 
@@ -73,14 +74,37 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public Page<PostDto> get(PostSearchDto postSearchDto, Pageable pageable) {
+    public Page<PostDto> getPostsUser(PostSearchDto postSearchDto, Pageable pageable) {
         log.info("PostService.get() StartMethod");
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
 
-        Specification<Post> specification = Specification
-                .where(SpecificationUtil.equalValueUUID(Post_.authorId, authorId)
-                        .and(SpecificationUtil.equalValue(Post_.isDeleted, postSearchDto.getIsDeleted())));
+        Specification<Post> specification =
+                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, false))
+                        .and(SpecificationUtil.equalValueUUID(Post_.authorId, postSearchDto.getAccountId()));
 
+        return getPostDto(pageable, specification);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostDto> getNewsPosts(PostSearchDto postSearchDto, Pageable pageable) {
+        log.info("PostService.get() StartMethod");
+
+        List<UUID> authorIds = userRepository.findIdByFirstName(postSearchDto.getAuthor())
+                .stream()
+                .map(User::getId)
+                .toList();
+
+        Specification<Post> specification =
+                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, false))
+                .and(SpecificationUtil.isContainsValue(Post_.postText, postSearchDto.getText()))
+                .and(SpecificationUtil.isContainsAuthor(Post_.authorId, authorIds))
+                .and(SpecificationUtil.withFriends(postSearchDto.getWithFriends(), CurrentUserExtractor.getCurrentUserFromAuthentication().getId()))
+                .and(SpecificationUtil.isBetween(Post_.time, postSearchDto.getDateFrom(), postSearchDto.getDateTo())
+                .and(SpecificationUtil.IsContainsTags(postSearchDto.getTags())));
+
+        return getPostDto(pageable, specification);
+    }
+
+    private PageImpl<PostDto> getPostDto(Pageable pageable, Specification<Post> specification) {
         Page<Post> page = postRepository.findAll(specification, pageable);
 
         List<PostDto> postDtos = page.getContent().stream()
@@ -89,13 +113,21 @@ public class PostService {
 
         postDtos.forEach(postDto -> {
             postDto.setCommentsCount(commentRepository.commentCount(postDto.getId()));
-            postDto.setLikeAmount(likeRepository.likeCount(postDto.getId()));
+            postDto.setLikeAmount(likeRepository.likeCountForPost(postDto.getId()));
             postDto.setReactionType(likeRepository.getReactionType(postDto.getId()));
+            String myReaction = likeRepository.getMyReactionForPost(
+                    CurrentUserExtractor.getCurrentUserFromAuthentication().getId(),
+                    postDto.getId());
+            postDto.setMyReaction(myReaction);
+            postDto.setMyLike(myReaction != null);
+            String withFriends = likeRepository.isContainsFriends(
+                    CurrentUserExtractor.getCurrentUserFromAuthentication().getId(),
+                    postDto.getAuthorId());
+            postDto.setWithFriends(withFriends != null && withFriends.equals("FRIEND"));
         });
 
         return new PageImpl<>(postDtos, pageable, page.getTotalElements());
     }
-
 
     public PostDto update(PostDto postDto) {
         log.info("PostService.update() StartMethod");
@@ -105,17 +137,9 @@ public class PostService {
         return postDto;
     }
 
-    @Transactional(readOnly = true)
-    public PostDto getPost(String id) {
-        log.info("PostService.getPost() StartMethod");
-        PostDto postDto = postMapper.postEntityToPostDto(postRepository.getById(UUID.fromString(id)));
-        postDto.setCommentsCount(commentRepository.commentCount(UUID.fromString(id)));
-        postDto.setLikeAmount(likeRepository.likeCount(UUID.fromString(id)));
-        return postDto;
-    }
-
     public LikeDto addLikeToPost(UUID postId, LikeDto likeDto) {
-        likeDto.setAuthorId(CurrentUserExtractor.getCurrentUser().getId());
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
+        likeDto.setAuthorId(authorId);
         likeDto.setItemId(postId);
         likeDto.setType(CommentTypeDto.POST);
 
@@ -135,7 +159,7 @@ public class PostService {
     }
 
     public LikeDto deleteLikeToPost(UUID postId) {
-        UUID authorId = CurrentUserExtractor.getCurrentUser().getId();
+        UUID authorId = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         Like like = likeRepository.findByPostIdAndAuthorIdAndIsDeletedFalse(postId, authorId);
         like.setIsDeleted(true);
         return likeMapper.likeToLikeDto(likeRepository.save(like));
@@ -154,14 +178,4 @@ public class PostService {
         postRepository.deleteById(id);
         return "Post deleted";
     }
-
-    public String deleteComment(UUID commentId) {
-        likeRepository.deleteByCommentId(commentId);
-        commentRepository.deleteById(commentId);
-        return "Comment deleted";
-    }
-
-//    public void updateDelayedPost(PostDto post) {
-//        return null;
-//    }
 }

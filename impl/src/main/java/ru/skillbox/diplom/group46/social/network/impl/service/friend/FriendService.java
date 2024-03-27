@@ -105,7 +105,7 @@ public class FriendService {
     public Page<FriendDto> getFriends(FriendSearchDto friendSearchDto, Pageable pageable) {
         Specification<Friend> specification = SpecificationUtil
                 .equalValueUUID(Friend_.authorId, UUID.fromString(getAuthorId().toString()))
-                .and(SpecificationUtil.ContainsValue(Friend_.statusCode, friendSearchDto.getStatusCode()));
+                .and(SpecificationUtil.isContainsValue(Friend_.statusCode, friendSearchDto.getStatusCode()));
         Page<FriendDto> friendList = friendRepository.findAll(specification, pageable).map(friendMapper::friendToFriendDto);
         friendList.forEach(friendDto -> {
             setRating(friendDto, getAuthorId(), friendDto.getFriendId());
@@ -237,7 +237,7 @@ public class FriendService {
         return friend;
     }
     private UUID getAuthorId() {
-        return CurrentUserExtractor.getCurrentUser().getId();
+        return CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
     }
 
 

@@ -31,10 +31,8 @@ public interface CommentMapper {
     @InheritInverseConfiguration(name = "updateCommentDtoToEntity")
     CommentDto updateCommentToCommentDto(Comment comment);
 
-    @Mapping(target = "timeChanged", expression = "java(ZonedDateTime.now())")
+
     @Mapping(target = "commentText", source = "commentDTO.commentText")
-    @Mapping(target = "myLike", source = "commentDTO.myLike")
-    @Mapping(target = "imagePath", source = "commentDTO.imagePath")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment updateCommentDtoToEntity(CommentDto commentDTO, @MappingTarget Comment comment);
 

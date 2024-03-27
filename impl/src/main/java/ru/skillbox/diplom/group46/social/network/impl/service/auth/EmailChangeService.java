@@ -23,7 +23,7 @@ public class EmailChangeService {
     @Transactional
     public ResponseEntity<String> changeEmail(ChangeEmailDto changeEmailDto) {
 
-        UUID uuid = CurrentUserExtractor.getCurrentUser().getId();
+        UUID uuid = CurrentUserExtractor.getCurrentUserFromAuthentication().getId();
         User currentUser = userRepository.findById(uuid).orElse(null);
 
         if (currentUser == null) {

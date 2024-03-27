@@ -30,9 +30,8 @@ public class JwtUserExtractor {
         return new UserDTO(id, username, null, email);
     }
 
-    public UserDTO getUserFromAuthentication(Authentication authentication) {
+    public UserDTO getUserFromAuthentication(Authentication authentication) throws NullPointerException {
         Jwt jwt = (Jwt) authentication.getPrincipal();
-
         UUID id = UUID.fromString(jwt.getClaim("sub"));
         String username = jwt.getClaim("firstName");
         String email = jwt.getClaim("email");

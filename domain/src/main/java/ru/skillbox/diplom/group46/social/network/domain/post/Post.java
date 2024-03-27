@@ -6,8 +6,11 @@ import lombok.Setter;
 import ru.skillbox.diplom.group46.social.network.domain.base.audit.BaseAuditedEntity;
 import ru.skillbox.diplom.group46.social.network.domain.post.enums.Type;
 import ru.skillbox.diplom.group46.social.network.domain.tag.Tag;
+
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -36,15 +39,6 @@ public class Post extends BaseAuditedEntity {
 
     @Column(nullable = false, name = "is_blocked")
     private Boolean isBlocked;
-
-    @Column(name = "my_reaction")
-    private String myReaction;
-
-    @Column(name = "my_like")
-    private Boolean myLike;
-
-    @Column(name = "with_friends")
-    private Boolean withFriends;
 
     @Column(name = "image_path")
     private String imagePath;

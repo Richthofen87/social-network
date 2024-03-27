@@ -35,11 +35,11 @@ docker-deploy:
     - echo "Login successful"
 
     - echo "Building docker image..."
-    - docker build -t skillboxgroup46/social-network:v1.0.0 -f impl/Dockerfile .
+    - docker build -t skillboxgroup46/social-network:v1.0.4 -f impl/Dockerfile .
     - echo "Application built successfully"
 
     - echo "Pushing docker image..."
-    - docker push skillboxgroup46/social-network:v1.0.0
+    - docker push skillboxgroup46/social-network:v1.0.4
     - echo "Application pushed successfully"
   only:
     - develop
