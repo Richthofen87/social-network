@@ -72,7 +72,6 @@ public class PostService {
         return postMapper.postEntityToPostDto(postRepository.saveAndFlush(post));
     }
 
-
     @Transactional(readOnly = true)
     public Page<PostDto> getPostsUser(PostSearchDto postSearchDto, Pageable pageable) {
         log.info("PostService.get() StartMethod");

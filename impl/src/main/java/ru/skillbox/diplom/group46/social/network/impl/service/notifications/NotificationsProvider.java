@@ -44,7 +44,7 @@ public class NotificationsProvider {
             notification.setReceiverId(dto.getReceiverId());
             notes.add(notification);
         }
-        friendService.getFriendsIds(dto.getAuthorId())
+        else friendService.getFriendsIds(dto.getAuthorId())
                 .stream()
                 .filter(id -> {
                     Settings settings = settingsRepository.findByAccountId(id);

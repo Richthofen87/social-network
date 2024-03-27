@@ -94,6 +94,8 @@ public class AccountService {
         log.debug("Method deleteById(%s) started with param: \"%s\"".formatted(UUID.class, uuid));
         Account account = softDeleteById(uuid);
         account.setDeletionTimestamp(ZonedDateTime.now());
+        account.setFirstName("ACCOUNT DELETED");
+        account.setLastName("");
         return true;
     }
 
