@@ -19,6 +19,8 @@ import ru.skillbox.diplom.group46.social.network.impl.repository.user.UserReposi
 import ru.skillbox.diplom.group46.social.network.impl.service.user.UserService;
 import ru.skillbox.diplom.group46.social.network.impl.utils.auth.CurrentUserExtractor;
 
+import java.time.Instant;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -106,10 +108,10 @@ public class AuthService {
         String userEmail = CurrentUserExtractor.getCurrentUserFromAuthentication().getEmail();
         log.debug("Logging out user: {}", userEmail);
 
-        ResponseEntity<String> revokeTokensResponse = revokeUserTokens(userEmail);
-
-        if (revokeTokensResponse.getStatusCode() != HttpStatus.OK) {
-            log.error("Ошибка при отзыве токенов пользователя {} при выходе из системы", userEmail);
+        try {
+            tokenRevocationService.revokeUserTokensByEmail(userEmail);
+        } catch (RuntimeException e) {
+            log.error("Ошибка при отзыве токенов пользователя {} при выходе из системы", userEmail, e);
         }
 
         SecurityContextHolder.clearContext();
@@ -129,7 +131,24 @@ public class AuthService {
         if (user == null || !passwordEncoder.matches(authenticateDto.getPassword(), user.getPassword())) {
             throw new AuthenticationError(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль");
         }
+
+        long accessTokenExpirationSeconds = 15 * 60; // 15 минут
+        long refreshTokenExpirationSeconds = 24 * 60 * 60; // 24 часа
+
         AuthenticateResponseDto authenticateResponseDto = tokenGenerator.createToken(user);
+
+        tokenRevocationService.addToken(
+                authenticateResponseDto.getAccessToken(),
+                user.getId().toString(),
+                Instant.now().plusSeconds(accessTokenExpirationSeconds).toEpochMilli()
+        );
+
+        tokenRevocationService.addToken(
+                authenticateResponseDto.getRefreshToken(),
+                user.getId().toString(),
+                Instant.now().plusSeconds(refreshTokenExpirationSeconds).toEpochMilli()
+        );
+
         return authenticateResponseDto;
     }
 

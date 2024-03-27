@@ -47,8 +47,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        authService.logout(response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(authService.logout(response));
     }
 
     @Override
