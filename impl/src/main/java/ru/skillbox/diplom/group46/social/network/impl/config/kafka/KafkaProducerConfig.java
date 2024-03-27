@@ -32,9 +32,9 @@ public class KafkaProducerConfig {
             put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
             put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
             put(JsonSerializer.TYPE_MAPPINGS,
-                    "a: ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto, " +
-                    "b: ru.skillbox.diplom.group46.social.network.api.dto.dialog.MessageDto, " +
-                    "c: ru.skillbox.diplom.group46.social.network.api.dto.account.AccountStatusMessage");
+                    "notificationDto: ru.skillbox.diplom.group46.social.network.api.dto.notifications.NotificationDto, " +
+                    "messageDto: ru.skillbox.diplom.group46.social.network.api.dto.dialog.MessageDto, " +
+                    "accountStatusMessage: ru.skillbox.diplom.group46.social.network.api.dto.account.AccountStatusMessage");
         }};
     }
 
