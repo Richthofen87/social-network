@@ -63,6 +63,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/captcha").permitAll()
+                        .requestMatchers("/actuator").permitAll()
+                        .requestMatchers("/actuator/*").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/api/v1/auth/password/recovery/*").permitAll()
                         .requestMatchers("/api/v1/auth/admin/*").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
@@ -70,9 +74,9 @@ public class SecurityConfig {
                         oauth2.jwt((jwt) -> jwt.jwtAuthenticationConverter(jwtToUserConverter)))
 
                 .sessionManagement((session) ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-        http.addFilterBefore(jwtRequestFilter, BearerTokenAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 

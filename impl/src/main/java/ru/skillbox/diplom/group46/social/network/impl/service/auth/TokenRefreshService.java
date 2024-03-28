@@ -21,12 +21,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TokenRefreshService {
 
-    private final TokenGenerator tokenGenerator;
-    private final UserRepository userRepository;
     private final JwtDecoder jwtDecoder;
+    private final UserRepository userRepository;
+    private final TokenGenerator tokenGenerator;
+    private final TokenRevocationService tokenRevocationService;
+
 
     public AuthenticateResponseDto refreshToken(RefreshDto refreshTokenDto) {
         log.debug("Method refreshToken started: {}", refreshTokenDto);
+
+        // Проверяем, использовался ли уже этот refresh токен
+        if (tokenRevocationService.isRefreshTokenUsed(refreshTokenDto.getRefreshToken())) {
+            log.error("Refresh token has already been used");
+            throw new RuntimeException("Refresh token has already been used");
+        }
 
         Jwt jwt = jwtDecoder.decode(refreshTokenDto.getRefreshToken());
 
@@ -36,12 +44,22 @@ public class TokenRefreshService {
         }
 
         UserDTO currentUserDTO = CurrentUserExtractor.getUserFromJwt(jwt);
-
         UUID userId = currentUserDTO.getId();
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found for id: " + userId));
 
-        return tokenGenerator.createToken(user);
+        if (tokenRevocationService.isActive(refreshTokenDto.getRefreshToken(), userId.toString())) {
+
+            tokenRevocationService.revokeUserTokensByEmail(user.getEmail());
+
+            AuthenticateResponseDto newToken = tokenGenerator.createToken(user);
+
+            // Помечаем refresh токен как использованный
+            tokenRevocationService.markRefreshTokenAsUsed(refreshTokenDto.getRefreshToken());
+            return newToken;
+        } else {
+            log.error("Refresh token has been revoked");
+            throw new RuntimeException("Refresh token has been revoked");
+        }
     }
 }

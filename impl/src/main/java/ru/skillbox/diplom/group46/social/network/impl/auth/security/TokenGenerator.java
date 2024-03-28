@@ -31,7 +31,7 @@ public class TokenGenerator {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
-                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(1, ChronoUnit.DAYS))
                 .subject(user.getId().toString())
                 .claim("firstName", user.getFirstName())
                 .claim("lastName", user.getLastName())

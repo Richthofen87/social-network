@@ -25,7 +25,7 @@ public class OnlineStatusUpdateService {
         boolean isOnline = statusMessage.isOnline();
         Long lastOnlineTimeMillis = statusMessage.getLastLoginTime();
 
-        // актуально
+        // актуально 24.03.2024
         if (account != null) {
             account.setIsOnline(isOnline);
             ZonedDateTime lastOnlineTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(lastOnlineTimeMillis), ZoneId.systemDefault());
