@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group46.social.network.domain.tag.Tag;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class SpecificationUtil<T> {
@@ -19,6 +20,7 @@ public class SpecificationUtil<T> {
     public static Specification equalValue(SingularAttribute singularAttribute, Object object) {
         return (root, query, builder) -> object == null ? null : builder.equal(root.get(singularAttribute), object);
     }
+
     public static Specification notEqualValue(SingularAttribute singularAttribute, Object object) {
         return (root, query, builder) -> object == null ? null : builder.notEqual(root.get(singularAttribute), object);
     }
@@ -46,20 +48,22 @@ public class SpecificationUtil<T> {
         };
     }
 
-
-
     public static Specification<Post> IsContainsTags(List<String> tags) {
-
         return (root, query, builder) -> {
             if (tags == null || tags.isEmpty()) {
                 return builder.conjunction();
             } else {
-                Join<Post, Tag> tagJoin  = root.join("tags", JoinType.INNER);
-                Expression<String> tagNameExpression = tagJoin.get("name");
-                return tagNameExpression.in(tags);
+                List<String> lowerCaseTags = tags.stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toList());
+
+                Join<Post, Tag> tagJoin = root.join("tags", JoinType.INNER);
+                Expression<String> tagNameExpression = builder.lower(tagJoin.get("name"));
+                return tagNameExpression.in(lowerCaseTags);
             }
         };
     }
+
 
     public static Specification isContainsAuthor(SingularAttribute<Post, UUID> id, List<UUID> ids) {
         return (root, query, builder) -> ids == null || ids.isEmpty() ? builder.conjunction() :
@@ -69,6 +73,15 @@ public class SpecificationUtil<T> {
     public static Specification isContainsValue(SingularAttribute singularAttribute, String string) {
         return (root, query, builder) -> string == null ? builder.conjunction() :
                 builder.like(root.get(singularAttribute), "%" + string + "%");
+    }
+
+    public static Specification isContainsText(SingularAttribute singularAttribute, String string) {
+        return (root, query, builder) -> {
+            String searchString = string == null ? null : string.toLowerCase();
+            Path<String> attributePath = root.get(singularAttribute);
+            return searchString == null ? builder.conjunction() :
+                    builder.like(builder.lower(attributePath), "%" + searchString + "%");
+        };
     }
 
     public static Specification isLessValue(SingularAttribute singularAttribute, Comparable comparable) {
