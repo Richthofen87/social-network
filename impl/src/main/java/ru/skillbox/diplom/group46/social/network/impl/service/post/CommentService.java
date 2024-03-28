@@ -54,7 +54,7 @@ public class CommentService {
         Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
         comment.setPost(postRepository.getById(postId));
         kafkaProducerService.sendNotification(comment.getAuthorId(), null,
-                "Отправка коммента на пост", NotificationType.POST_COMMENT);
+                "", NotificationType.POST_COMMENT);
         return commentMapper.commentToCommentDto(commentRepository.save(comment));
     }
 
@@ -76,7 +76,7 @@ public class CommentService {
         like.setComment(commentRepository.getById(commentId));
 
         kafkaProducerService.sendNotification(like.getAuthorId(), null,
-                "Установка лайка на коммент", NotificationType.LIKE);
+                "оставил лайк к комментарию", NotificationType.LIKE);
 
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
@@ -142,7 +142,7 @@ public class CommentService {
         Comment comment = commentMapper.createCommentDtoToEntity(commentDto);
         comment.setPost(postRepository.getById(postId));
         kafkaProducerService.sendNotification(comment.getAuthorId(), null,
-                "Отправка коммента на коммент", NotificationType.COMMENT_COMMENT);
+                "", NotificationType.COMMENT_COMMENT);
         return commentMapper.commentToCommentDto(commentRepository.save(comment));
     }
 

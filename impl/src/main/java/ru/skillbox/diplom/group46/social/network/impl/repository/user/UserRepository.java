@@ -20,6 +20,6 @@ public interface UserRepository extends BaseRepository<User, UUID> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 
-    List<User> findIdByFirstName(String authorName);
+    List<User> findIdByFirstNameIgnoreCase(String authorName);
 
 }

@@ -68,7 +68,7 @@ public class PostService {
                 .collect(Collectors.toSet());
         post.setTags(tags);
         kafkaProducerService.sendNotification(post.getAuthorId(), null,
-                "Создание поста", NotificationType.POST);
+                "", NotificationType.POST);
         return postMapper.postEntityToPostDto(postRepository.saveAndFlush(post));
     }
 
@@ -77,7 +77,7 @@ public class PostService {
         log.info("PostService.get() StartMethod");
 
         Specification<Post> specification =
-                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, false))
+                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, postSearchDto.getIsDeleted()))
                         .and(SpecificationUtil.equalValueUUID(Post_.authorId, postSearchDto.getAccountId()));
 
         return getPostDto(pageable, specification);
@@ -87,14 +87,14 @@ public class PostService {
     public Page<PostDto> getNewsPosts(PostSearchDto postSearchDto, Pageable pageable) {
         log.info("PostService.get() StartMethod");
 
-        List<UUID> authorIds = userRepository.findIdByFirstName(postSearchDto.getAuthor())
+        List<UUID> authorIds = userRepository.findIdByFirstNameIgnoreCase(postSearchDto.getAuthor())
                 .stream()
                 .map(User::getId)
                 .toList();
 
         Specification<Post> specification =
-                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, false))
-                .and(SpecificationUtil.isContainsValue(Post_.postText, postSearchDto.getText()))
+                Specification.where(SpecificationUtil.equalValue(Post_.isDeleted, postSearchDto.getIsDeleted()))
+                .and(SpecificationUtil.isContainsText(Post_.postText, postSearchDto.getText()))
                 .and(SpecificationUtil.isContainsAuthor(Post_.authorId, authorIds))
                 .and(SpecificationUtil.withFriends(postSearchDto.getWithFriends(), CurrentUserExtractor.getCurrentUserFromAuthentication().getId()))
                 .and(SpecificationUtil.isBetween(Post_.time, postSearchDto.getDateFrom(), postSearchDto.getDateTo())
@@ -153,7 +153,7 @@ public class PostService {
         like.setPost(postRepository.getById(postId));
         like.setReactionType(likeDto.getReactionType());
         kafkaProducerService.sendNotification(like.getAuthorId(), null,
-                "Установка лайка на пост", NotificationType.LIKE);
+                "оставил лайк к посту", NotificationType.LIKE);
         return likeMapper.likeToLikeDto(likeRepository.save(like));
     }
 
